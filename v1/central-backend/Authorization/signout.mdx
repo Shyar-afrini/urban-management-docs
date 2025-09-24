@@ -1,0 +1,32 @@
+---
+title: "Signout"
+description: "Signout endpoint"
+---
+
+# POST /auth/signout
+
+Signout admins from the system using this endpoint
+
+<Note>Clears Session-token from the client side</Note>
+
+<Panel>
+<Tabs>
+<Tab title="Request">
+```typescript Request
+export async function signOut(): Promise<NO_CONTENT> {
+  try {
+    await api.post<NO_CONTENT>("/auth/signout");
+  } catch (err) {
+    return normalizeAxiosError(err);
+  }
+}
+```
+</Tab>
+
+<Tab title="Success">
+```mdx No Content
+Returns success with status code 204: No Content
+```
+</Tab>
+</Tabs>
+</Panel>

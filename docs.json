@@ -1,69 +1,52 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Mint Starter Kit",
+  "theme": "almond",
+  "name": "Urban Management Docs",
+  "description": "Urban Management documentation site",
   "colors": {
     "primary": "#16A34A",
     "light": "#07C983",
     "dark": "#15803D"
   },
+  "banner": {
+    "content": "✨ The Urban Management docs now have a brand-new home! Explore the improved documentation experience",
+    "dismissible": false
+  },
+  "icons": { "library": "lucide" },
   "favicon": "/favicon.svg",
   "navigation": {
-    "tabs": [
+    "versions": [
       {
-        "tab": "Guides",
+        "version": "Central Backend",
         "groups": [
           {
+            "tag": "Start here",
             "group": "Getting started",
             "pages": [
-              "index",
-              "quickstart",
-              "development"
+              "v1/central-backend/quickstart",
+              "v1/central-backend/jwt-secret-setup",
+              "v1/central-backend/database-setup",
+              "v1/central-backend/backblaze-setup",
+              "v1/central-backend/finish-setup"
             ]
           },
           {
-            "group": "Customization",
+            "group": "Authorization",
             "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+              "v1/central-backend/Authorization/signin",
+              "v1/central-backend/Authorization/signout",
+              "v1/central-backend/Authorization/validate-session"
             ]
           }
         ]
       },
       {
-        "tab": "API reference",
+        "version": "Mobile Backend",
         "groups": [
           {
-            "group": "API documentation",
-            "pages": [
-              "api-reference/introduction"
-            ]
-          },
-          {
-            "group": "Endpoint examples",
-            "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
-            ]
+            "tag": "Start here",
+            "group": "Getting started",
+            "pages": ["v1/mobile-backend/quickstart"]
           }
         ]
       }
@@ -71,27 +54,23 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
+          "anchor": "Updates",
           "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
+          "icon": "flame"
         }
       ]
     }
   },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "light": "/logo/Urban Management light.svg",
+    "dark": "/logo/Urban Management.svg"
   },
   "navbar": {
     "links": [
       {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "label": "Repository",
+        "icon": "github",
+        "href": "https://github.com/dilshad-khalil/urban-managment"
       }
     ],
     "primary": {
@@ -102,15 +81,15 @@
   },
   "contextual": {
     "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
   },
   "footer": {
     "socials": {
