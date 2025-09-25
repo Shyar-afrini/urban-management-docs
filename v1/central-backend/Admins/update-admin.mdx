@@ -1,0 +1,90 @@
+---
+title: "Update Admin"
+description: "Update Admin"
+---
+
+<Info>Authenticated route</Info>
+## PUT /admins
+
+<ResponseField name="admins" type="Admins Update Object">
+  <Expandable title="body">
+    <ResponseField name="fullname" type="string">
+      User's fullname
+    </ResponseField>
+    <ResponseField name="email" type="string">
+      User's email
+    </ResponseField>
+    <ResponseField name="profilePhoto" type="string">
+      User's profile photo
+    </ResponseField>
+    <ResponseField name="age" type="integer" example="24" />
+    <ResponseField name="nationality" type="string" />
+    <ResponseField
+      name="documentNumber"
+      type="string"
+      example="123B-ASBLASNBFLNAKSFP"
+    >
+      Document Number
+    </ResponseField>
+    <ResponseField name="gender" type="enum" example="MALE">
+      Male or Female
+    </ResponseField>
+    <ResponseField name="isActive" type="boolean">
+      True or False
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+---
+
+### Helpers
+
+Type and schema helpers for parsing and inferring types
+
+```ts UpdateAdmin
+//? Use this for type infer
+const updatedAdmin: UpdateAdmin;
+```
+
+```ts updateAdminSchema
+function parse(
+  schema: ZodSchema<updateAdminSchema>,
+  data: unknown
+): TResult<NewAdmin> {
+  const result = schema.safeParse(data);
+  if (!result.success) {
+    return {
+      success: false,
+      error: {
+        code: BAD_REQUEST_STATUS,
+        message: BAD_REQUEST_ERR,
+        details: result.error.flatten(),
+      },
+    };
+  }
+  return { success: true, data: result.data };
+}
+```
+
+<ResponseExample>
+```json Success
+{
+    "success": true,
+    "data": {
+        "id": "3159fecd-f9f2-46ac-82c6-8054072dfff1",
+        "fullname": "Shyar Afrini",
+        "email": "shyarafrin2@gmail.com",
+        "profilePhoto": "https://link-to-profile-photo",
+        "nationality": "Syrian",
+        "gender": "MALE",
+        "roleId": null,
+        "age": 22,
+        "documentNumber": "OHOhsfoas097uf0u90fj03029u23fa23j7t",
+        "isActive": true,
+        "lastLoginAt": "2025-09-25T09:07:59.091Z",
+        "createdAt": "2025-09-10T14:54:02.523Z",
+        "updatedAt": "2025-09-10T14:54:02.523Z"
+    }
+}
+```
+</ResponseExample>

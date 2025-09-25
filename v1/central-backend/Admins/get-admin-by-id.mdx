@@ -1,0 +1,59 @@
+---
+title: "Get Admin By ID"
+description: "Get Admin By Using uuid"
+---
+
+<Info>Authenticated route</Info>
+## GET /admins/\<uuid\>
+
+### Helpers
+
+Type and schema helpers for parsing and inferring types
+
+```ts Admin
+//? Use this for type infer
+const adminData: Admin;
+```
+
+```ts selectAdminSchema
+function parse(
+  schema: ZodSchema<selectAdminSchema>,
+  data: unknown
+): TResult<Admin> {
+  const result = schema.safeParse(data);
+  if (!result.success) {
+    return {
+      success: false,
+      error: {
+        code: BAD_REQUEST_STATUS,
+        message: BAD_REQUEST_ERR,
+        details: result.error.flatten(),
+      },
+    };
+  }
+  return { success: true, data: result.data };
+}
+```
+
+<ResponseExample>
+```json Success
+{
+    "success": true,
+    "data": {
+            "id": "853758e0-ed85-4243-bb03-4c5006eb0084",
+            "fullname": "Dilshad Khalil",
+            "email": "dilshadkhalil@gmail.com",
+            "profilePhoto": "https://link-to-profile-photo",
+            "nationality": "Syrian",
+            "gender": "MALE",
+            "roleId": null,
+            "age": 23,
+            "documentNumber": "OHOhshgb918hdf1bn908rh01h3f80n8103",
+            "isActive": true,
+            "lastLoginAt": null,
+            "createdAt": "2025-09-11T08:17:49.839Z",
+            "updatedAt": "2025-09-11T08:17:49.839Z"
+        },
+}
+```
+</ResponseExample>

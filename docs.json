@@ -37,6 +37,33 @@
               "v1/central-backend/Authorization/signout",
               "v1/central-backend/Authorization/validate-session"
             ]
+          },
+          {
+            "group": "Users",
+            "pages": [
+              "v1/central-backend/Users/get-users",
+              "v1/central-backend/Users/get-user-by-id",
+              "v1/central-backend/Users/get-user-by-phone-number",
+              "v1/central-backend/Users/create-user",
+              "v1/central-backend/Users/update-user",
+              "v1/central-backend/Users/deactivate-user",
+              "v1/central-backend/Users/activate-user",
+              "v1/central-backend/Users/delete-user"
+            ]
+          },
+          {
+            "group": "Admins",
+            "pages": [
+              "v1/central-backend/Admins/get-admins",
+              "v1/central-backend/Admins/get-admin-by-id",
+              "v1/central-backend/Admins/get-current-session",
+              "v1/central-backend/Admins/create-admin",
+              "v1/central-backend/Admins/update-admin",
+              "v1/central-backend/Admins/change-admin-password",
+              "v1/central-backend/Admins/deactivate-admin",
+              "v1/central-backend/Admins/activate-admin",
+              "v1/central-backend/Admins/delete-admin"
+            ]
           }
         ]
       },
@@ -72,12 +99,7 @@
         "icon": "github",
         "href": "https://github.com/dilshad-khalil/urban-managment"
       }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
-    }
+    ]
   },
   "contextual": {
     "options": [

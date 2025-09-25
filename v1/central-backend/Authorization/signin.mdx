@@ -7,6 +7,15 @@ description: "Signin endpoint"
 
 Sign in a user with email and password. Returns a session token you can use for authenticated requests.
 
+### Request Body
+
+<ParamField path="body" type="string" required>
+  email
+</ParamField>
+<ParamField path="body" type="string" required>
+  password
+</ParamField>
+
 ```mermaid
 sequenceDiagram
     participant Client
@@ -20,22 +29,42 @@ sequenceDiagram
 
 ---
 
-### Request Body
+### Helpers
 
-<ParamField path="body" type="string" required>
-  email
-</ParamField>
-<ParamField path="body" type="string" required>
-  password
-</ParamField>
+Type and schema helpers for parsing and inferring types
+
+```ts AuthInput
+//? Use this for type infer
+const authInputData: AuthInput = { email, password };
+```
+
+```ts AuthInputSchema
+function parse(
+  schema: ZodSchema<AuthInputSchema>,
+  data: unknown
+): TResult<AuthInput> {
+  const result = schema.safeParse(data);
+  if (!result.success) {
+    return {
+      success: false,
+      error: {
+        code: BAD_REQUEST_STATUS,
+        message: BAD_REQUEST_ERR,
+        details: result.error.flatten(),
+      },
+    };
+  }
+  return { success: true, data: result.data };
+}
+```
 
 <Panel>
 <Tabs>
 <Tab title="Request">
 ```typescript Request
-export async function signIn(email: string, password: string): Promise<SignInResponse> {
+export async function signIn(email: string, password: string): Promise<AuthInput> {
   try {
-    const { data } = await api.post<SignInResponse>("/auth/signin", { email, password });
+    const { data } = await api.post<AuthInput>("/auth/signin", { email, password });
     return data;
   } catch (err) {
     return normalizeAxiosError(err);

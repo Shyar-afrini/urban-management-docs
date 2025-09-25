@@ -1,0 +1,32 @@
+---
+title: "Delete Admin"
+description: "Delete Admin"
+---
+
+<Info>Authenticated route</Info>
+## DELETE /admins/\<uuid\>
+
+<Danger>This action can not be undone</Danger>
+
+<ResponseExample>
+```json Success
+{
+    "success": true,
+    "data": {
+        "id": "3159fecd-f9f2-46ac-82c6-8054072dfff1",
+        "fullname": "Shyar Afrini",
+        "email": "shyarafrin2@gmail.com",
+        "profilePhoto": "https://link-to-profile-photo",
+        "nationality": "Syrian",
+        "gender": "MALE",
+        "roleId": null,
+        "age": 22,
+        "documentNumber": "OHOhsfoas097uf0u90fj03029u23fa23j7t",
+        "isActive": true,
+        "lastLoginAt": "2025-09-25T09:07:59.091Z",
+        "createdAt": "2025-09-10T14:54:02.523Z",
+        "updatedAt": "2025-09-10T14:54:02.523Z"
+    }
+}
+```
+</ResponseExample>

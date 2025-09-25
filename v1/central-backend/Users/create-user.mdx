@@ -1,0 +1,94 @@
+---
+title: "Create User"
+description: "Create new users on both mobile and central servers"
+---
+
+<Info>Authenticated route</Info>
+## POST /users
+
+<Expandable title="User Schema">
+  <ResponseField
+    name="fullname"
+    type="string"
+    example="Dilshad Khalil"
+    required
+  />
+  <ResponseField
+    name="phoneNumber"
+    type="string"
+    example="07518202480"
+    required
+  />
+  <ResponseField name="secondPhoneNumber" type="string" example="07518202482" />
+  <ResponseField name="maritalStatus" type="string" example="SINGLE" required />
+  <ResponseField
+    name="profilePhoto"
+    type="string"
+    example="https://link-to-profile-photo"
+  >
+    URL to the user’s profile photo
+  </ResponseField>
+  <ResponseField name="nationality" type="string" example="Syrian" required />
+  <ResponseField name="gender" type="string" example="MALE" required />
+  <ResponseField name="age" type="integer" example="23" required />
+  <ResponseField
+    name="documentNumber"
+    type="string"
+    example="OHOhshgb918hdf1bn908rh01h3f80n8103"
+    required
+  />
+  <ResponseField name="isActive" type="boolean" example="true" />
+</Expandable>
+
+### Helpers
+
+Type and schema helpers for parsing and inferring types
+
+```ts ServerUser
+//? Use this for type infer
+const newUser: NewServerUser;
+```
+
+```ts insertUserSchema
+function parse(
+  schema: ZodSchema<insertUserSchema>,
+  data: unknown
+): TResult<NewServerUser> {
+  const result = schema.safeParse(data);
+  if (!result.success) {
+    return {
+      success: false,
+      error: {
+        code: BAD_REQUEST_STATUS,
+        message: BAD_REQUEST_ERR,
+        details: result.error.flatten(),
+      },
+    };
+  }
+  return { success: true, data: result.data };
+}
+```
+
+<ResponseExample>
+```json Success
+{
+    "success": true,
+    "data": {
+            "id": "7e11fb1c-4a36-4b35-a168-89cf9f6ab8c1",
+            "fullname": "Shyar Afrini",
+            "phoneNumber": "07518202481",
+            "secondPhoneNumber": "07518202485",
+            "profilePhoto": "http://link-to-profile-photo",
+            "nationality": "Syrian",
+            "maritalStatus": "SINGLE",
+            "gender": "MALE",
+            "age": 22,
+            "documentNumber": "onasof8297gf8g827e1r1f1f3f",
+            "isActive": true,
+            "lastLoginAt": null,
+            "createdAt": "2025-09-11T13:38:20.424Z",
+            "updatedAt": "2025-09-11T13:38:20.424Z"
+        },
+}
+```
+</ResponseExample>

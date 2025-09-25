@@ -1,0 +1,60 @@
+---
+title: "Delete User"
+description: "Delete users on both mobile and central servers"
+---
+
+<Info>Authenticated route</Info>
+## DELETE /users/\<uuid\>
+
+### Helpers
+
+Type and schema helpers for parsing and inferring types
+
+```ts ServerUser
+//? Use this for type infer
+const User: ServerUser;
+```
+
+```ts selectUserSchema
+function parse(
+  schema: ZodSchema<selectUserSchema>,
+  data: unknown
+): TResult<ServerUser> {
+  const result = schema.safeParse(data);
+  if (!result.success) {
+    return {
+      success: false,
+      error: {
+        code: BAD_REQUEST_STATUS,
+        message: BAD_REQUEST_ERR,
+        details: result.error.flatten(),
+      },
+    };
+  }
+  return { success: true, data: result.data };
+}
+```
+
+<ResponseExample>
+```json Success
+{
+    "success": true,
+    "data": {
+            "id": "7e11fb1c-4a36-4b35-a168-89cf9f6ab8c1",
+            "fullname": "Shyar Afrini",
+            "phoneNumber": "07518202481",
+            "secondPhoneNumber": "07518202485",
+            "profilePhoto": "http://link-to-profile-photo",
+            "nationality": "Syrian",
+            "maritalStatus": "SINGLE",
+            "gender": "MALE",
+            "age": 22,
+            "documentNumber": "onasof8297gf8g827e1r1f1f3f",
+            "isActive": true,
+            "lastLoginAt": null,
+            "createdAt": "2025-09-11T13:38:20.424Z",
+            "updatedAt": "2025-09-11T13:38:20.424Z"
+        },
+}
+```
+</ResponseExample>
