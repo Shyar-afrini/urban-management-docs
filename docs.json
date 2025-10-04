@@ -68,32 +68,32 @@
           {
             "group": "Sectors",
             "pages": [
-              "v1/central-backend/Sectors/get-all-sectors",
-              "v1/central-backend/Sectors/create-sector",
-              "v1/central-backend/Sectors/update-sector",
-              "v1/central-backend/Sectors/delete-sector"
+              "v1/central-backend/sectors/get-all-sectors",
+              "v1/central-backend/sectors/create-sector",
+              "v1/central-backend/sectors/update-sector",
+              "v1/central-backend/sectors/delete-sector"
             ]
           },
           {
             "group": "Buildings",
             "pages": [
-              "v1/central-backend/Sectors/Buildings/get-all-buildings",
-              "v1/central-backend/Sectors/Buildings/get-building-by-id",
-              "v1/central-backend/Sectors/Buildings/get-buildings-by-sector-id",
-              "v1/central-backend/Sectors/Buildings/create-building",
-              "v1/central-backend/Sectors/Buildings/update-building",
-              "v1/central-backend/Sectors/Buildings/delete-building"
+              "v1/central-backend/sectors/Buildings/get-all-buildings",
+              "v1/central-backend/sectors/Buildings/get-building-by-id",
+              "v1/central-backend/sectors/Buildings/get-buildings-by-sector-id",
+              "v1/central-backend/sectors/Buildings/create-building",
+              "v1/central-backend/sectors/Buildings/update-building",
+              "v1/central-backend/sectors/Buildings/delete-building"
             ]
           },
           {
             "group": "Floors",
             "pages": [
-              "v1/central-backend/Sectors/Buildings/Floors/get-floors-by-building-id",
-              "v1/central-backend/Sectors/Buildings/Floors/get-units-by-floor-id",
-              "v1/central-backend/Sectors/Buildings/Floors/get-floor-by-id",
-              "v1/central-backend/Sectors/Buildings/Floors/create-new-floor",
-              "v1/central-backend/Sectors/Buildings/Floors/update-floor",
-              "v1/central-backend/Sectors/Buildings/Floors/delete-floor"
+              "v1/central-backend/sectors/Buildings/Floors/get-floors-by-building-id",
+              "v1/central-backend/sectors/Buildings/Floors/get-units-by-floor-id",
+              "v1/central-backend/sectors/Buildings/Floors/get-floor-by-id",
+              "v1/central-backend/sectors/Buildings/Floors/create-new-floor",
+              "v1/central-backend/sectors/Buildings/Floors/update-floor",
+              "v1/central-backend/sectors/Buildings/Floors/delete-floor"
             ]
           }
         ]
@@ -141,6 +141,11 @@
           "anchor": "BackBlaze Setup",
           "href": "http://localhost:3003/v1/central-backend/backblaze-setup",
           "icon": "image"
+        },
+        {
+          "anchor": "Finish Environment Setup",
+          "href": "http://localhost:3003/v1/central-backend/finish-setup",
+          "icon": "container"
         }
       ]
     }
