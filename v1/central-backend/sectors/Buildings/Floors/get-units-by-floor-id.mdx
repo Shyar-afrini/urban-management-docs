@@ -1,0 +1,59 @@
+---
+title: "Get Units By Floor ID"
+description: "Get Units By Floor ID Endpoint"
+---
+
+<Info>Authenticated route</Info>
+## GET /sectors/buildings/floors/:id/units
+
+### Helpers
+
+Type and schema helpers for parsing and inferring types
+
+```ts Unit
+//? Use this for type infer
+const unitData: Unit;
+```
+
+```ts selectUnitSchema
+function parse(
+  schema: ZodSchema<selectUnitSchema>,
+  data: unknown
+): TResult<Unit> {
+  const result = schema.safeParse(data);
+  if (!result.success) {
+    return {
+      success: false,
+      error: {
+        code: BAD_REQUEST_STATUS,
+        message: BAD_REQUEST_ERR,
+        details: result.error.flatten(),
+      },
+    };
+  }
+  return { success: true, data: result.data };
+}
+```
+
+<ResponseExample>
+```json Success
+{
+    "success": true,
+    "data": [
+        {
+            "id": "26d2d183-7217-4630-a9f8-4b89c1676e93",
+            "floorId": "c65e41c0-6936-4448-91ea-9e4c0e8509cf",
+            "blockId": null,
+            "addressId": null,
+            "unitNumber": 3,
+            "unitStatus": "AVAILABLE",
+            "prefix": "C",
+            "suffix": "B",
+            "sizeSqM": 100,
+            "bedroom": 2,
+            "bathroom": 1
+        }
+    ]
+}
+```
+</ResponseExample>

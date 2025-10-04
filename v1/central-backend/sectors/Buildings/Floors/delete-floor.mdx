@@ -1,0 +1,24 @@
+---
+title: "Delete Floors"
+description: "Delete floors for buildings"
+---
+
+<Info>Authenticated route</Info>
+## DELETE /sectors/buildings/floors/:id
+
+<Danger>This action can not be undone</Danger>
+
+<ResponseExample>
+```json Success
+{
+    "success": true,
+    "data": {
+        "id": "629864e7-49f2-4ceb-a176-c130f74a0795",
+        "buildingId": "170b6733-f0d2-49bb-a9e6-c9ee016022ad",
+        "floorNumber": 6,
+        "unitCount": 3,
+        "planImage": "http://link-to-this-image"
+    }
+}
+```
+</ResponseExample>

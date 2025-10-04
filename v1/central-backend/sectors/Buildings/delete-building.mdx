@@ -1,0 +1,28 @@
+---
+title: "Delete Building"
+description: "Delete Building Endpoint"
+---
+
+<Info>Authenticated route</Info>
+## DELETE /sectors/buildings/\<uuid\>
+
+<Danger>This action can not be undone</Danger>
+<Warning>Deleting a building will delete all the entries under it</Warning>
+
+<ResponseExample>
+```json Success
+{
+    "success": true,
+    "data": {
+            "id": "170b6733-f0d2-49bb-a9e6-c9ee016022ad",
+            "sectorId": "08273d45-2d1f-44ed-873e-31f657b100a6",
+            "name": "Cihan A Building",
+            "image": "http://link-to-this-image",
+            "addressId": "66a22c16-b942-4d42-84c6-c10c10ebfdb9",
+            "floorCount": 12,
+            "yearBuilt": 2025,
+            "status": "ACTIVE" 
+        },
+}
+```
+</ResponseExample>

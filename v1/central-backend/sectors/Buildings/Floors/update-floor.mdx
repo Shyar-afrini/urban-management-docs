@@ -1,0 +1,69 @@
+---
+title: "Update Floors"
+description: "Update floors for buildings"
+---
+
+<Info>Authenticated route</Info>
+## PUT /sectors/buildings/floors/:id
+
+<Expandable title="Update Floors Schema">
+  <ResponseField
+    name="buildingId"
+    type="string"
+    example="08273d45-2d1f-44ed-873e-31f657b100a6"
+  />
+  <ResponseField name="floorNumber" type="number" />
+  <ResponseField
+    name="planImage"
+    type="string"
+    example="http://link-to-this-image"
+  >
+    URL to the building image
+  </ResponseField>
+  <ResponseField name="unitCount" type="number" example="4" />
+  <ResponseField name="floorCount" type="integer" example="12" />
+</Expandable>
+
+### Helpers
+
+Type and schema helpers for parsing and inferring types
+
+```ts Floor
+//? Use this for type infer
+const updatedFloorData: UpdateFloor;
+```
+
+```ts updateFloorSchema
+function parse(
+  schema: ZodSchema<updateFloorSchema>,
+  data: unknown
+): TResult<Floor> {
+  const result = schema.safeParse(data);
+  if (!result.success) {
+    return {
+      success: false,
+      error: {
+        code: BAD_REQUEST_STATUS,
+        message: BAD_REQUEST_ERR,
+        details: result.error.flatten(),
+      },
+    };
+  }
+  return { success: true, data: result.data };
+}
+```
+
+<ResponseExample>
+```json Success
+{
+    "success": true,
+    "data": {
+        "id": "629864e7-49f2-4ceb-a176-c130f74a0795",
+        "buildingId": "170b6733-f0d2-49bb-a9e6-c9ee016022ad",
+        "floorNumber": 6,
+        "unitCount": 3,
+        "planImage": "http://link-to-this-image"
+    }
+}
+```
+</ResponseExample>

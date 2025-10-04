@@ -1,0 +1,25 @@
+---
+title: "Delete Sectors"
+description: "Delete Sectors Endpoint"
+---
+
+<Info>Authenticated route</Info>
+## DELETE /sectors/\<uuid\>
+
+<Danger>This action can not be undone</Danger>
+<Warning>Deleting a sector will delete all the entries under it</Warning>
+
+<ResponseExample>
+```json Success
+{
+    "success": true,
+    "data": {
+            "id": "08273d45-2d1f-44ed-873e-31f657b100a6",
+            "name": "Cihan B City",
+            "type": "BUILDING",
+            "addressId": "3e506f4e-bfe7-4ca1-a294-4cac73effe1d",
+            "image": "http://link-to-this-image"
+        },
+}
+```
+</ResponseExample>

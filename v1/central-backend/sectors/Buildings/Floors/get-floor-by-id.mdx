@@ -1,0 +1,51 @@
+---
+title: "Get Floors By ID"
+description: "Get Floors By ID Endpoint"
+---
+
+<Info>Authenticated route</Info>
+## GET /sectors/buildings/floors/:id
+
+### Helpers
+
+Type and schema helpers for parsing and inferring types
+
+```ts Floor
+//? Use this for type infer
+const floorData: Floor;
+```
+
+```ts selectFloorSchema
+function parse(
+  schema: ZodSchema<selectFloorSchema>,
+  data: unknown
+): TResult<Floor> {
+  const result = schema.safeParse(data);
+  if (!result.success) {
+    return {
+      success: false,
+      error: {
+        code: BAD_REQUEST_STATUS,
+        message: BAD_REQUEST_ERR,
+        details: result.error.flatten(),
+      },
+    };
+  }
+  return { success: true, data: result.data };
+}
+```
+
+<ResponseExample>
+```json Success
+{
+    "success": true,
+    "data": {
+        "id": "c65e41c0-6936-4448-91ea-9e4c0e8509cf",
+        "buildingId": "170b6733-f0d2-49bb-a9e6-c9ee016022ad",
+        "floorNumber": 5,
+        "unitCount": 3,
+        "planImage": "http://link-to-this-image"
+    }
+}
+```
+</ResponseExample>

@@ -3,69 +3,30 @@ title: "Quickstart"
 description: "Setup your project locally"
 ---
 
-## Get started in three steps
+## Start a local server
 
-Get your **Urban-Management MonoRepo** setup running locally and make your first customization.
+Create a local copy of your **Urban Management** monorepo to start customizing.
 
-<Steps>
-  <Step title="First Step">
-    <Snippet src="../snippets/git-clone-quickstart.mdx" />
-  </Step>
-</Steps>
+### 1st Step: Cloning the project
 
-### Step 2: Deploy your changes
+Clone the repository by copying and pasting this into your terminal.
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+```bash repository clone script wrap
+git clone https://github.com/dilshad-khalil/urban-managment.git
+```
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+<Note>Make sure you have permissions to access the repository</Note>
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
+### 2nd Step: Installing dependencies
 
-  </Accordion>
-</AccordionGroup>
+We use [pnpm](https://pnpm.io/) to initialize the monorepo
 
-### Step 3: Go live
+**Run the following command in the terminal**
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes. 2. Your docs will update and be live in
-  moments!
-</Accordion>
+```bash dependency install script wrap
+pnpm install
+```
 
-## Next steps
-
-Now that you have your docs running, explore these key features:
-
-<CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
-</CardGroup>
-
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join
-  our [community](https://mintlify.com/community).
-</Note>
+<Info>
+  This command will install all the dependencies into the root node_modules
+</Info>

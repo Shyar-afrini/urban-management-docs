@@ -1,0 +1,72 @@
+---
+title: "Create New Blocks"
+description: "Create New Blocks"
+---
+
+<Info>Authenticated route</Info>
+## POST /sectors/blocks
+
+<Expandable title="Blocks Schema">
+  <ResponseField
+    name="sectorId"
+    type="string"
+    example="08273d45-2d1f-44ed-873e-31f657b100a6"
+    required
+  />
+  <ResponseField name="name" type="string" required />
+  <ResponseField name="description" type="string" />
+  <ResponseField name="image" type="string" example="http://link-to-this-image">
+    URL to the Block image
+  </ResponseField>
+  <ResponseField name="houseCount" type="number" example="4" />
+</Expandable>
+
+### Helpers
+
+Type and schema helpers for parsing and inferring types
+
+```ts Block
+//? Use this for type infer
+const blockData: Block[];
+```
+
+```ts selectBlockSchema
+function parse(
+  schema: ZodSchema<selectBlockSchema>,
+  data: unknown
+): TResult<Block[]> {
+  const result = schema.safeParse(data);
+  if (!result.success) {
+    return {
+      success: false,
+      error: {
+        code: BAD_REQUEST_STATUS,
+        message: BAD_REQUEST_ERR,
+        details: result.error.flatten(),
+      },
+    };
+  }
+  return { success: true, data: result.data };
+}
+```
+
+<ResponseExample>
+```json Success
+{
+    "success": true,
+    "data": [
+        {
+            "id": "170b6733-f0d2-49bb-a9e6-c9ee016022ad",
+            "sectorId": "08273d45-2d1f-44ed-873e-31f657b100a6",
+            "name": "Cihan A Building",
+            "image": "http://link-to-this-image",
+            "addressId": "66a22c16-b942-4d42-84c6-c10c10ebfdb9",
+            "floorCount": 12,
+            "yearBuilt": 2025,
+            "status": "ACTIVE"
+        },
+        //? etc
+    ]
+}
+```
+</ResponseExample>

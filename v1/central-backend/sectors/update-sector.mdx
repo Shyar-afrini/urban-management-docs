@@ -1,0 +1,66 @@
+---
+title: "Update Sectors"
+description: "Update Sectors Endpoint"
+---
+
+<Info>Authenticated route</Info>
+## PUT /sectors
+
+<Expandable title="Sector Update Schema">
+  <ResponseField name="name" type="string" example="Cihan B City" />
+  <ResponseField name="type" type="enum" example="BUILDING">
+    Building or City-Group
+  </ResponseField>
+  <ResponseField
+    name="addressId"
+    type="string"
+    example="3e506f4e-bfe7-4ca1-a294-4cac73effe1d"
+  />
+  <ResponseField name="image" type="string" example="http://link-to-this-image">
+    URL to the building image
+  </ResponseField>
+</Expandable>
+
+### Helpers
+
+Type and schema helpers for parsing and inferring types
+
+```ts UpdateSector
+//? Use this for type infer
+const updateSectorData: UpdateSector;
+```
+
+```ts updateSectorSchema
+function parse(
+  schema: ZodSchema<updateSectorSchema>,
+  data: unknown
+): TResult<UpdateSector> {
+  const result = schema.safeParse(data);
+  if (!result.success) {
+    return {
+      success: false,
+      error: {
+        code: BAD_REQUEST_STATUS,
+        message: BAD_REQUEST_ERR,
+        details: result.error.flatten(),
+      },
+    };
+  }
+  return { success: true, data: result.data };
+}
+```
+
+<ResponseExample>
+```json Success
+{
+    "success": true,
+    "data": {
+            "id": "08273d45-2d1f-44ed-873e-31f657b100a6",
+            "name": "Cihan B City",
+            "type": "BUILDING",
+            "addressId": "3e506f4e-bfe7-4ca1-a294-4cac73effe1d",
+            "image": "http://link-to-this-image"
+        },
+}
+```
+</ResponseExample>

@@ -64,6 +64,37 @@
               "v1/central-backend/Admins/activate-admin",
               "v1/central-backend/Admins/delete-admin"
             ]
+          },
+          {
+            "group": "Sectors",
+            "pages": [
+              "v1/central-backend/Sectors/get-all-sectors",
+              "v1/central-backend/Sectors/create-sector",
+              "v1/central-backend/Sectors/update-sector",
+              "v1/central-backend/Sectors/delete-sector"
+            ]
+          },
+          {
+            "group": "Buildings",
+            "pages": [
+              "v1/central-backend/Sectors/Buildings/get-all-buildings",
+              "v1/central-backend/Sectors/Buildings/get-building-by-id",
+              "v1/central-backend/Sectors/Buildings/get-buildings-by-sector-id",
+              "v1/central-backend/Sectors/Buildings/create-building",
+              "v1/central-backend/Sectors/Buildings/update-building",
+              "v1/central-backend/Sectors/Buildings/delete-building"
+            ]
+          },
+          {
+            "group": "Floors",
+            "pages": [
+              "v1/central-backend/Sectors/Buildings/Floors/get-floors-by-building-id",
+              "v1/central-backend/Sectors/Buildings/Floors/get-units-by-floor-id",
+              "v1/central-backend/Sectors/Buildings/Floors/get-floor-by-id",
+              "v1/central-backend/Sectors/Buildings/Floors/create-new-floor",
+              "v1/central-backend/Sectors/Buildings/Floors/update-floor",
+              "v1/central-backend/Sectors/Buildings/Floors/delete-floor"
+            ]
           }
         ]
       },
@@ -73,7 +104,13 @@
           {
             "tag": "Start here",
             "group": "Getting started",
-            "pages": ["v1/mobile-backend/quickstart"]
+            "pages": [
+              "v1/mobile-backend/quickstart",
+              "v1/mobile-backend/jwt-secret-setup",
+              "v1/mobile-backend/database-setup",
+              "v1/mobile-backend/backblaze-setup",
+              "v1/mobile-backend/finish-setup"
+            ]
           }
         ]
       }
@@ -84,6 +121,26 @@
           "anchor": "Updates",
           "href": "https://mintlify.com/blog",
           "icon": "flame"
+        },
+        {
+          "anchor": "Quick Start",
+          "href": "http://localhost:3003/v1/central-backend/quickstart",
+          "icon": "pizza"
+        },
+        {
+          "anchor": "Create JWT Secret",
+          "href": "http://localhost:3003/v1/central-backend/jwt-secret-setup",
+          "icon": "code"
+        },
+        {
+          "anchor": "Database Setup",
+          "href": "http://localhost:3003/v1/central-backend/database-setup",
+          "icon": "database"
+        },
+        {
+          "anchor": "BackBlaze Setup",
+          "href": "http://localhost:3003/v1/central-backend/backblaze-setup",
+          "icon": "image"
         }
       ]
     }
