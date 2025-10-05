@@ -1,0 +1,48 @@
+---
+title: "Create Otp"
+description: "Create otp for whatsapp auth messaging"
+---
+
+# POST /auth/otp/create
+
+## Before requesting Otp
+
+you need to insert the access token from the signin request inside the bearer authentication in postman
+
+<Card
+  img="../../../../images/auth/mobile-bearer-path.png"
+  title="Bearer Path"
+/>
+
+## Setup whatsapp business
+
+before sending otps you need a whatsapp session key to access the platform and be able to send messages
+
+<Steps>
+  <Step title="Create a Meta developer account">
+    Create a Meta developer account. 
+    <Tooltip tip="Click to open the Meta developer registration page">
+        <a href="https://developers.facebook.com/async/registration" target="_blank" rel="noreferrer">
+        Create Account
+        </a>
+    </Tooltip>
+  </Step>
+
+<Step title="Configure your app">Register a new whatsapp application</Step>
+<Step title="Open Whatsapp application">
+  Redirect to your whatsapp application from the meta dashboard, then create a
+  new access key.
+</Step>
+
+<Step title="Environment Setup 1st">
+  After getting you new access key insert it into the .env file inside of the
+  primary backend folder, as WHATSAPP_ACCESS_TOKEN.
+</Step>
+
+<Step title="Environment Setup 2nd">
+also add these variables, WHATSAPP_PHONE_NUMBER_ID add the phone number ID, 
+</Step>
+<Step title="Environment Setup 3rd">
+  finally insert the whatsapp business account ID as WHATSAPP_BUSINESS_ACCOUNT_ID
+</Step>
+</Steps>

@@ -20,17 +20,6 @@
         "version": "Central Backend",
         "groups": [
           {
-            "tag": "Start here",
-            "group": "Getting started",
-            "pages": [
-              "v1/central-backend/quickstart",
-              "v1/central-backend/jwt-secret-setup",
-              "v1/central-backend/database-setup",
-              "v1/central-backend/backblaze-setup",
-              "v1/central-backend/finish-setup"
-            ]
-          },
-          {
             "group": "Authorization",
             "pages": [
               "v1/central-backend/Authorization/signin",
@@ -82,18 +71,18 @@
               "v1/central-backend/sectors/Buildings/get-buildings-by-sector-id",
               "v1/central-backend/sectors/Buildings/create-building",
               "v1/central-backend/sectors/Buildings/update-building",
-              "v1/central-backend/sectors/Buildings/delete-building"
-            ]
-          },
-          {
-            "group": "Floors",
-            "pages": [
-              "v1/central-backend/sectors/Buildings/Floors/get-floors-by-building-id",
-              "v1/central-backend/sectors/Buildings/Floors/get-units-by-floor-id",
-              "v1/central-backend/sectors/Buildings/Floors/get-floor-by-id",
-              "v1/central-backend/sectors/Buildings/Floors/create-new-floor",
-              "v1/central-backend/sectors/Buildings/Floors/update-floor",
-              "v1/central-backend/sectors/Buildings/Floors/delete-floor"
+              "v1/central-backend/sectors/Buildings/delete-building",
+              {
+                "group": "Floors",
+                "pages": [
+                  "v1/central-backend/sectors/Buildings/Floors/get-floors-by-building-id",
+                  "v1/central-backend/sectors/Buildings/Floors/get-units-by-floor-id",
+                  "v1/central-backend/sectors/Buildings/Floors/get-floor-by-id",
+                  "v1/central-backend/sectors/Buildings/Floors/create-new-floor",
+                  "v1/central-backend/sectors/Buildings/Floors/update-floor",
+                  "v1/central-backend/sectors/Buildings/Floors/delete-floor"
+                ]
+              }
             ]
           }
         ]
@@ -102,14 +91,30 @@
         "version": "Mobile Backend",
         "groups": [
           {
-            "tag": "Start here",
-            "group": "Getting started",
+            "group": "Mobile Backend",
+            "pages": ["v1/mobile-backend/quickstart"]
+          },
+          {
+            "tag": "Start Here",
+            "group": "Authorization",
             "pages": [
-              "v1/mobile-backend/quickstart",
-              "v1/mobile-backend/jwt-secret-setup",
-              "v1/mobile-backend/database-setup",
-              "v1/mobile-backend/backblaze-setup",
-              "v1/mobile-backend/finish-setup"
+              "/v1/mobile-backend/authorization/signin",
+              "/v1/mobile-backend/authorization/signout",
+              {
+                "group": "Session",
+                "pages": [
+                  "/v1/mobile-backend/authorization/session/request-new-session",
+                  "/v1/mobile-backend/authorization/session/validate-session"
+                ]
+              },
+              {
+                "group": "OTP",
+                "pages": [
+                  "/v1/mobile-backend/authorization/otp/create-otp",
+                  "/v1/mobile-backend/authorization/otp/resend-otp",
+                  "/v1/mobile-backend/authorization/otp/validate-otp"
+                ]
+              }
             ]
           }
         ]

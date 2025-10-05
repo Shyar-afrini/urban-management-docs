@@ -1,0 +1,49 @@
+---
+title: "Sign In"
+description: "Sign into tbe mobile backend auth system"
+---
+
+# POST /auth/signin
+
+Sign in a user with phone number. Returns an access token you can use for authenticated requests as header bearer for otp creation.
+
+### Request Body
+
+<ParamField path="body" type="string" required>
+  Phone Number
+</ParamField>
+
+``` mermaid
+sequenceDiagram
+    autonumber
+    participant C as Client (App)
+    participant MS as Mobile Server
+    participant PS as Primary Server (API)
+    participant DB as Primary DB (per-city shard)
+    participant WA as WhatsApp
+
+    Note over C: Start sign-in
+    C->>MS: POST /auth/signin { phone }
+    MS->>DB: Resolve city by phone<br/>Route to city’s shard
+    DB-->>MS: City resolved
+    MS->>DB: Create Access Token (TTL=1h)
+    DB-->>MS: { access_token }
+    MS-->>C: 200 OK { access_token }
+
+    Note over C,PS: Create OTP (requires Bearer access token)
+    C->>PS: POST /auth/otp/create<br/>Authorization: Bearer {access_token}
+    PS->>DB: Validate access token & user
+    DB-->>PS: OK
+    PS->>WA: Send OTP via WhatsApp
+    WA-->>C: OTP message delivered
+
+    Note over C,PS: Validate OTP to get long-lived session
+    C->>PS: POST /auth/otp/validate<br/>{ otp } + Bearer {access_token}
+    PS->>DB: Verify OTP & user
+    DB-->>PS: OK
+    PS-->>C: 200 OK { session_token (TTL=30d) }
+
+```
+
+<Note>access_token can be used as bearer token for otp requests</Note>
+```
