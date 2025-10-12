@@ -1,0 +1,40 @@
+---
+title: "Upload Image"
+description: "Upload image file"
+---
+
+<Info>Authenticated route</Info>
+## POST /images/upload
+
+<Expandable title="Upload Schema">
+  <ResponseField
+    name="image"
+    type="file"
+    required
+  >
+    Image file to upload (form-data)
+  </ResponseField>
+</Expandable>
+
+### Helpers
+
+Type and schema helpers for parsing and inferring types
+
+```ts ImageResponse
+//? Use this for type infer
+const imageResponse: ImageResponse;
+```
+
+<ResponseExample>
+```json Success
+{
+    "success": true,
+    "data": {
+        "url": "https://example.com/images/uploaded-image.jpg",
+        "filename": "uploaded-image.jpg",
+        "size": 1024000,
+        "mimeType": "image/jpeg"
+    }
+}
+```
+</ResponseExample>

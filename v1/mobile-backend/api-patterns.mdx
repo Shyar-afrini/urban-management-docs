@@ -1,0 +1,136 @@
+---
+title: "Mobile API Patterns"
+description: "Common patterns and conventions used in the Mobile Backend API"
+---
+
+## Overview
+
+The Mobile Backend follows consistent patterns optimized for mobile applications. Understanding these patterns will help you integrate more effectively.
+
+## URL Structure
+
+### Base URL Pattern
+```
+http://localhost:3002/api/v1/{resource}
+```
+
+## HTTP Methods
+
+### Standard Operations
+
+| Method | Purpose | Example |
+|--------|---------|---------|
+| `GET` | Retrieve resource(s) | `GET /users/current` |
+| `POST` | Create/authenticate | `POST /auth/signin` |
+
+## Request Patterns
+
+### Authentication
+All protected endpoints require Bearer token:
+
+```http
+Authorization: Bearer jwt_token_here
+```
+
+### Content Type
+All requests with body must include:
+
+```http
+Content-Type: application/json
+```
+
+## Response Patterns
+
+### Success Response Format
+
+```json
+{
+  "success": true,
+  "data": { ... },
+  "message": "Operation successful"
+}
+```
+
+### Error Response Format
+
+```json
+{
+  "success": false,
+  "error": {
+    "message": "Error description",
+    "code": "ERROR_CODE",
+    "details": { ... }
+  }
+}
+```
+
+## Authentication Flow
+
+1. **Phone Sign In**: POST `/auth/signin` with phone number
+2. **Create OTP**: POST `/auth/otp/create` with access token
+3. **Validate OTP**: POST `/auth/otp/validate` with OTP code
+4. **Use Session**: Include session token in Authorization header
+
+## Mobile-Specific Features
+
+- **Phone-based Auth**: Uses phone numbers instead of email/password
+- **OTP Verification**: SMS-based verification system
+- **Bearer Tokens**: Header-based authentication
+- **Lightweight Responses**: Optimized for mobile networks
+- **Rate Limiting**: Protection against abuse
+
+## Example Usage
+
+### React Native
+
+```javascript
+// Configure API client
+const apiClient = axios.create({
+  baseURL: 'http://localhost:3002/api/v1',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Add token to requests
+apiClient.interceptors.request.use((config) => {
+  const token = AsyncStorage.getItem('sessionToken');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+```
+
+### Flutter
+
+```dart
+class ApiClient {
+  static const String baseUrl = 'http://localhost:3002/api/v1';
+  
+  static Future<Map<String, String>> _getHeaders() async {
+    final token = await SecureStorage.read('sessionToken');
+    return {
+      'Content-Type': 'application/json',
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+  }
+}
+```
+
+## Best Practices
+
+### Token Management
+- Store tokens securely using platform-specific secure storage
+- Implement automatic token refresh
+- Handle token expiration gracefully
+
+### Error Handling
+- Check for authentication errors and redirect to login
+- Implement retry logic for network failures
+- Show user-friendly error messages
+
+### Performance
+- Implement request caching where appropriate
+- Use pagination for large datasets
+- Optimize for mobile network conditions

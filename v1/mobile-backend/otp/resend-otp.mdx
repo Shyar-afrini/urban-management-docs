@@ -1,0 +1,377 @@
+---
+title: "Resend OTP"
+description: "Resend OTP code to user's phone number"
+---
+
+## Overview
+
+The resend OTP endpoint generates and sends a new OTP code to the user's phone number. This is useful when the original OTP has expired or the user didn't receive it.
+
+## Endpoint
+
+```
+POST /api/v1/auth/otp/resend
+```
+
+## Request
+
+### Headers
+```http
+Authorization: Bearer {access_token}
+```
+
+### Authentication
+Requires Bearer token from phone sign-in endpoint.
+
+## Response
+
+### Success Response (200 OK)
+
+```json
+{
+  "message": "OTP resent successfully",
+  "sessionToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `message` | string | Success message |
+| `sessionToken` | string | Updated access token |
+
+## Error Responses
+
+### Rate Limit Exceeded (429 Too Many Requests)
+
+```json
+{
+  "success": false,
+  "error": {
+    "message": "Too many OTP requests",
+    "code": "RATE_LIMIT_EXCEEDED",
+    "details": "Please wait 60 seconds before requesting another OTP"
+  }
+}
+```
+
+### Unauthorized (401 Unauthorized)
+
+```json
+{
+  "success": false,
+  "error": {
+    "message": "Invalid or expired access token",
+    "code": "UNAUTHORIZED",
+    "details": "Please sign in again"
+  }
+}
+```
+
+## Rate Limiting
+
+### OTP Resend Limits
+- **Per Phone Number**: 1 resend per minute
+- **Per User**: 3 resends per hour
+- **Per IP Address**: 5 resends per minute
+
+## Example Usage
+
+### JavaScript/Fetch
+
+```javascript
+const resendOTP = async (accessToken) => {
+  try {
+    const response = await fetch('/api/v1/auth/otp/resend', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      }
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error.message);
+    }
+
+    const data = await response.json();
+    
+    // Update access token if provided
+    if (data.sessionToken) {
+      localStorage.setItem('accessToken', data.sessionToken);
+    }
+    
+    return data.message;
+  } catch (error) {
+    console.error('OTP resend failed:', error.message);
+    throw error;
+  }
+};
+
+// Usage
+try {
+  const accessToken = localStorage.getItem('accessToken');
+  const message = await resendOTP(accessToken);
+  console.log('OTP resent:', message);
+} catch (error) {
+  console.error('Failed to resend OTP:', error.message);
+}
+```
+
+### React Native
+
+```javascript
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const resendOTP = async () => {
+  try {
+    const accessToken = await AsyncStorage.getItem('accessToken');
+    
+    const response = await fetch('http://localhost:3002/api/v1/auth/otp/resend', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      }
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.error.message);
+    }
+    
+    // Update access token if provided
+    if (data.sessionToken) {
+      await AsyncStorage.setItem('accessToken', data.sessionToken);
+    }
+    
+    return data.message;
+  } catch (error) {
+    console.error('OTP resend failed:', error.message);
+    throw error;
+  }
+};
+```
+
+### Flutter
+
+```dart
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+
+class OTPService {
+  static const String baseURL = 'http://localhost:3002/api/v1';
+  
+  Future<String> resendOTP() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final accessToken = prefs.getString('accessToken');
+      
+      if (accessToken == null) {
+        throw Exception('No access token found');
+      }
+      
+      final response = await http.post(
+        Uri.parse('$baseURL/auth/otp/resend'),
+        headers: {'Authorization': 'Bearer $accessToken'},
+      );
+      
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        
+        // Update access token if provided
+        if (data['sessionToken'] != null) {
+          await prefs.setString('accessToken', data['sessionToken']);
+        }
+        
+        return data['message'];
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(error['error']['message']);
+      }
+    } catch (e) {
+      throw Exception('OTP resend failed: $e');
+    }
+  }
+}
+```
+
+## UI Implementation
+
+### Resend Button Component
+
+```javascript
+const ResendOTPButton = ({ onResend, disabled, countdown }) => {
+  const [timeLeft, setTimeLeft] = useState(countdown || 0);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (timeLeft > 0) {
+      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [timeLeft]);
+
+  const handleResend = async () => {
+    setLoading(true);
+    try {
+      await onResend();
+      setTimeLeft(60); // 60 second cooldown
+    } catch (error) {
+      console.error('Resend failed:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleResend}
+      disabled={disabled || timeLeft > 0 || loading}
+      className="resend-button"
+    >
+      {loading ? 'Sending...' : 
+       timeLeft > 0 ? `Resend in ${timeLeft}s` : 
+       'Resend OTP'}
+    </button>
+  );
+};
+```
+
+### Complete OTP Form
+
+```javascript
+const OTPForm = () => {
+  const [otp, setOtp] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [resendCooldown, setResendCooldown] = useState(0);
+
+  const handleValidate = async (otpCode) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const accessToken = localStorage.getItem('accessToken');
+      const result = await validateOTP(otpCode, accessToken);
+      
+      // Redirect to main app
+      window.location.href = '/dashboard';
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResend = async () => {
+    try {
+      const accessToken = localStorage.getItem('accessToken');
+      await resendOTP(accessToken);
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  return (
+    <div className="otp-form">
+      <h2>Enter Verification Code</h2>
+      <p>We sent a 6-digit code to your phone</p>
+      
+      <form onSubmit={(e) => {
+        e.preventDefault();
+        handleValidate(otp);
+      }}>
+        <input
+          type="text"
+          value={otp}
+          onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+          placeholder="000000"
+          maxLength={6}
+          className="otp-input"
+        />
+        
+        {error && <div className="error">{error}</div>}
+        
+        <button 
+          type="submit" 
+          disabled={loading || otp.length !== 6}
+        >
+          {loading ? 'Verifying...' : 'Verify'}
+        </button>
+      </form>
+      
+      <ResendOTPButton 
+        onResend={handleResend}
+        countdown={resendCooldown}
+      />
+    </div>
+  );
+};
+```
+
+## Best Practices
+
+### When to Show Resend Button
+- **After 30 seconds**: Allow resend if user hasn't received OTP
+- **On error**: Show resend option when OTP validation fails
+- **On expiry**: Automatically show resend when OTP expires
+
+### User Experience
+- **Clear messaging**: Tell users when they can resend
+- **Countdown timer**: Show remaining time until next resend
+- **Error handling**: Provide clear error messages
+- **Loading states**: Show loading indicators during operations
+
+### Security Considerations
+- **Rate limiting**: Respect server-side rate limits
+- **Cooldown periods**: Implement client-side cooldowns
+- **Error messages**: Don't reveal sensitive information
+- **Token refresh**: Handle access token updates
+
+## Error Handling
+
+### Common Scenarios
+
+1. **Rate Limited**: Too many resend requests
+2. **Token Expired**: Access token has expired
+3. **SMS Failure**: SMS service is down
+4. **Network Error**: Connection issues
+
+### Error Recovery
+
+```javascript
+const resendOTPWithRetry = async (accessToken, maxRetries = 3) => {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await resendOTP(accessToken);
+    } catch (error) {
+      if (error.message.includes('RATE_LIMIT_EXCEEDED')) {
+        // Wait before retry
+        await new Promise(resolve => setTimeout(resolve, 60000));
+        continue;
+      }
+      
+      if (error.message.includes('UNAUTHORIZED')) {
+        // Redirect to sign in
+        window.location.href = '/signin';
+        return;
+      }
+      
+      if (i === maxRetries - 1) {
+        throw error;
+      }
+    }
+  }
+};
+```
+
+## Related Endpoints
+
+- [Phone Sign In](/v1/mobile-backend/auth/signin)
+- [Create OTP](/v1/mobile-backend/otp/create-otp)
+- [Validate OTP](/v1/mobile-backend/otp/validate-otp)
+- [Sign Out](/v1/mobile-backend/auth/signout)

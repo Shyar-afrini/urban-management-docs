@@ -1,0 +1,60 @@
+---
+title: "Update Vehicle"
+description: "Update vehicle information"
+---
+
+<Info>Authenticated route</Info>
+## PUT /vehicles/uuid
+
+<ResponseField
+  name="uuid"
+  type="param"
+  example="7e11fb1c-4a36-4b35-a168-89cf9f6ab8c1"
+  required
+/>
+
+<Expandable title="Update Schema">
+  <ResponseField
+    name="plateNumber"
+    type="string"
+    example="ABC-123"
+  />
+  <ResponseField
+    name="vehicleType"
+    type="string"
+    example="CAR"
+  />
+  <ResponseField
+    name="userId"
+    type="string"
+    example="7e11fb1c-4a36-4b35-a168-89cf9f6ab8c2"
+  >
+    Owner user ID
+  </ResponseField>
+</Expandable>
+
+### Helpers
+
+Type and schema helpers for parsing and inferring types
+
+```ts Vehicle
+//? Use this for type infer
+const updateVehicle: UpdateVehicle;
+```
+
+<ResponseExample>
+```json Success
+{
+    "success": true,
+    "data": {
+        "id": "7e11fb1c-4a36-4b35-a168-89cf9f6ab8c1",
+        "plateNumber": "ABC-123",
+        "vehicleType": "CAR",
+        "isBlacklisted": false,
+        "userId": "7e11fb1c-4a36-4b35-a168-89cf9f6ab8c2",
+        "createdAt": "2025-09-11T13:38:20.424Z",
+        "updatedAt": "2025-09-11T13:38:20.424Z"
+    }
+}
+```
+</ResponseExample>

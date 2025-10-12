@@ -1,0 +1,44 @@
+---
+title: "Get Role Presets"
+description: "Get predefined role permission sets"
+---
+
+<Info>Authenticated route</Info>
+## GET /permissions/presets
+
+### Helpers
+
+Type and schema helpers for parsing and inferring types
+
+```ts Record<string, string[]>
+//? Use this for type infer
+const rolePresets: Record<string, string[]>;
+```
+
+<ResponseExample>
+```json Success
+{
+    "success": true,
+    "data": {
+        "admin": [
+            "user:read",
+            "user:write",
+            "user:delete",
+            "admin:read",
+            "admin:write",
+            "admin:delete"
+        ],
+        "manager": [
+            "user:read",
+            "user:write",
+            "vehicle:read",
+            "vehicle:write"
+        ],
+        "viewer": [
+            "user:read",
+            "vehicle:read"
+        ]
+    }
+}
+```
+</ResponseExample>

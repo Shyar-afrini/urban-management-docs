@@ -1,0 +1,471 @@
+---
+title: "Mobile Authentication Flow"
+description: "Understanding the phone-based authentication system in the Mobile Backend"
+---
+
+## Overview
+
+The Mobile Backend uses a phone-based authentication system with OTP (One-Time Password) verification. This provides a secure, mobile-friendly authentication flow that doesn't require traditional email/password combinations.
+
+## Authentication Architecture
+
+### Components
+
+1. **Phone Numbers**: Primary identifier for users
+2. **OTP System**: SMS-based verification
+3. **Bearer Tokens**: JWT tokens in Authorization header
+4. **Session Management**: Database-backed session tracking
+
+### Flow Diagram
+
+<Mermaid>
+sequenceDiagram
+    participant Mobile
+    participant AuthController
+    participant AuthService
+    participant Database
+    participant SMS
+    participant AuthGuard
+
+    Mobile->>AuthController: POST /auth/signin (phone)
+    AuthController->>AuthService: signin(phoneNumber)
+    AuthService->>Database: findOrCreateUser()
+    Database-->>AuthService: user data
+    AuthService->>AuthController: user + accessToken
+    AuthController-->>Mobile: user data + accessToken
+    
+    Note over Mobile: Store accessToken locally
+    
+    Mobile->>AuthController: POST /auth/otp/create
+    AuthController->>AuthService: createOtp(user)
+    AuthService->>SMS: sendOTP(phone, otp)
+    SMS-->>AuthService: OTP sent
+    AuthService-->>AuthController: success
+    AuthController-->>Mobile: OTP sent confirmation
+    
+    Mobile->>AuthController: POST /auth/otp/validate (otp)
+    AuthController->>AuthService: validateOtp(otp, userId)
+    AuthService->>Database: verifyOTP()
+    Database-->>AuthService: OTP valid
+    AuthService->>AuthController: sessionToken
+    AuthController-->>Mobile: sessionToken
+    
+    Note over Mobile: Use sessionToken for API calls
+    
+    Mobile->>AuthGuard: Request with Bearer token
+    AuthGuard->>Database: validateSession()
+    Database-->>AuthGuard: session data
+    AuthGuard-->>Mobile: Allow/Deny access
+</Mermaid>
+
+## Authentication Endpoints
+
+### Phone Sign In
+
+**Endpoint**: `POST /auth/signin`
+
+**Request Body**:
+```json
+{
+  "phoneNumber": "+1234567890"
+}
+```
+
+**Response**:
+```json
+{
+  "user": {
+    "id": "uuid",
+    "phoneNumber": "+1234567890",
+    "isActive": true,
+    "createdAt": "2024-01-01T00:00:00Z"
+  },
+  "accessToken": "jwt_token"
+}
+```
+
+### OTP Creation
+
+**Endpoint**: `POST /auth/otp/create`
+
+**Headers**: Requires Bearer token from sign-in
+
+**Response**:
+```json
+{
+  "message": "OTP sent successfully"
+}
+```
+
+### OTP Validation
+
+**Endpoint**: `POST /auth/otp/validate`
+
+**Request Body**:
+```json
+{
+  "otp": "123456"
+}
+```
+
+**Headers**: Requires Bearer token from sign-in
+
+**Response**:
+```json
+{
+  "message": "OTP validated successfully",
+  "sessionToken": "jwt_session_token"
+}
+```
+
+### OTP Resend
+
+**Endpoint**: `POST /auth/otp/resend`
+
+**Headers**: Requires Bearer token from sign-in
+
+**Response**:
+```json
+{
+  "message": "OTP resent successfully",
+  "sessionToken": "jwt_session_token"
+}
+```
+
+### Sign Out
+
+**Endpoint**: `POST /auth/signout`
+
+**Headers**: Requires Bearer token
+
+**Response**: `204 No Content`
+
+## Security Features
+
+### Phone Number Validation
+- International format required (`+1234567890`)
+- E.164 format validation
+- Country code validation
+
+### OTP Security
+- 6-digit numeric OTP
+- 5-minute expiration
+- Single-use tokens
+- Rate limiting on OTP requests
+
+### Token Security
+- JWT tokens with expiration
+- Bearer token authentication
+- Database session validation
+- Automatic token refresh
+
+## Mobile Implementation
+
+### React Native Example
+
+```javascript
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+class MobileAuth {
+  constructor() {
+    this.baseURL = 'http://localhost:3002/api/v1';
+  }
+
+  async signIn(phoneNumber) {
+    try {
+      const response = await fetch(`${this.baseURL}/auth/signin`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ phoneNumber }),
+      });
+
+      const data = await response.json();
+      
+      if (data.user && data.accessToken) {
+        await AsyncStorage.setItem('accessToken', data.accessToken);
+        await AsyncStorage.setItem('userId', data.user.id);
+        return data;
+      }
+      
+      throw new Error('Sign in failed');
+    } catch (error) {
+      console.error('Sign in error:', error);
+      throw error;
+    }
+  }
+
+  async createOTP() {
+    const token = await AsyncStorage.getItem('accessToken');
+    
+    try {
+      const response = await fetch(`${this.baseURL}/auth/otp/create`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+      return data.message;
+    } catch (error) {
+      console.error('OTP creation error:', error);
+      throw error;
+    }
+  }
+
+  async validateOTP(otp) {
+    const token = await AsyncStorage.getItem('accessToken');
+    
+    try {
+      const response = await fetch(`${this.baseURL}/auth/otp/validate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ otp }),
+      });
+
+      const data = await response.json();
+      
+      if (data.sessionToken) {
+        await AsyncStorage.setItem('sessionToken', data.sessionToken);
+        return data;
+      }
+      
+      throw new Error('OTP validation failed');
+    } catch (error) {
+      console.error('OTP validation error:', error);
+      throw error;
+    }
+  }
+
+  async signOut() {
+    const token = await AsyncStorage.getItem('sessionToken');
+    
+    try {
+      await fetch(`${this.baseURL}/auth/signout`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      // Clear stored tokens
+      await AsyncStorage.multiRemove(['accessToken', 'sessionToken', 'userId']);
+    } catch (error) {
+      console.error('Sign out error:', error);
+      // Still clear local storage even if server request fails
+      await AsyncStorage.multiRemove(['accessToken', 'sessionToken', 'userId']);
+    }
+  }
+
+  async makeAuthenticatedRequest(endpoint, options = {}) {
+    const token = await AsyncStorage.getItem('sessionToken');
+    
+    return fetch(`${this.baseURL}${endpoint}`, {
+      ...options,
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+    });
+  }
+}
+
+export default new MobileAuth();
+```
+
+### Flutter Example
+
+```dart
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+
+class MobileAuthService {
+  static const String baseURL = 'http://localhost:3002/api/v1';
+  
+  Future<Map<String, dynamic>> signIn(String phoneNumber) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseURL/auth/signin'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'phoneNumber': phoneNumber}),
+      );
+      
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final prefs = await SharedPreferences.getInstance();
+        
+        await prefs.setString('accessToken', data['accessToken']);
+        await prefs.setString('userId', data['user']['id']);
+        
+        return data;
+      }
+      
+      throw Exception('Sign in failed');
+    } catch (e) {
+      throw Exception('Sign in error: $e');
+    }
+  }
+  
+  Future<String> createOTP() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('accessToken');
+    
+    try {
+      final response = await http.post(
+        Uri.parse('$baseURL/auth/otp/create'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data['message'];
+      }
+      
+      throw Exception('OTP creation failed');
+    } catch (e) {
+      throw Exception('OTP creation error: $e');
+    }
+  }
+  
+  Future<Map<String, dynamic>> validateOTP(String otp) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('accessToken');
+    
+    try {
+      final response = await http.post(
+        Uri.parse('$baseURL/auth/otp/validate'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode({'otp': otp}),
+      );
+      
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        
+        if (data['sessionToken'] != null) {
+          await prefs.setString('sessionToken', data['sessionToken']);
+        }
+        
+        return data;
+      }
+      
+      throw Exception('OTP validation failed');
+    } catch (e) {
+      throw Exception('OTP validation error: $e');
+    }
+  }
+  
+  Future<void> signOut() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('sessionToken');
+    
+    try {
+      await http.post(
+        Uri.parse('$baseURL/auth/signout'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+    } catch (e) {
+      // Continue with cleanup even if server request fails
+    } finally {
+      // Clear stored tokens
+      await prefs.remove('accessToken');
+      await prefs.remove('sessionToken');
+      await prefs.remove('userId');
+    }
+  }
+  
+  Future<http.Response> makeAuthenticatedRequest(
+    String endpoint, {
+    String method = 'GET',
+    Map<String, dynamic>? body,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('sessionToken');
+    
+    final uri = Uri.parse('$baseURL$endpoint');
+    
+    switch (method.toUpperCase()) {
+      case 'GET':
+        return await http.get(
+          uri,
+          headers: {'Authorization': 'Bearer $token'},
+        );
+      case 'POST':
+        return await http.post(
+          uri,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          body: body != null ? json.encode(body) : null,
+        );
+      default:
+        throw Exception('Unsupported HTTP method: $method');
+    }
+  }
+}
+```
+
+## Error Handling
+
+### Common Error Scenarios
+
+1. **Invalid Phone Number**: Phone number format validation
+2. **OTP Expired**: OTP has expired (5-minute limit)
+3. **Invalid OTP**: Wrong OTP code entered
+4. **Rate Limited**: Too many OTP requests
+5. **Token Expired**: Session token has expired
+
+### Error Response Examples
+
+```json
+{
+  "success": false,
+  "error": {
+    "message": "Invalid phone number format",
+    "code": "VALIDATION_ERROR",
+    "details": "Phone number must be in international format"
+  }
+}
+```
+
+```json
+{
+  "success": false,
+  "error": {
+    "message": "OTP has expired",
+    "code": "OTP_EXPIRED",
+    "details": "OTP is only valid for 5 minutes"
+  }
+}
+```
+
+## Best Practices
+
+### Security
+1. **Store Tokens Securely**: Use secure storage for tokens
+2. **Validate Phone Numbers**: Ensure proper phone number format
+3. **Handle OTP Expiration**: Implement OTP expiration handling
+4. **Rate Limiting**: Respect rate limits on OTP requests
+
+### User Experience
+1. **Clear Error Messages**: Provide user-friendly error messages
+2. **OTP Resend**: Allow users to resend OTP if needed
+3. **Auto-logout**: Implement automatic logout on token expiration
+4. **Offline Handling**: Handle network errors gracefully
+
+## Related Endpoints
+
+- [Phone Sign In](/v1/mobile-backend/auth/signin)
+- [Create OTP](/v1/mobile-backend/otp/create-otp)
+- [Validate OTP](/v1/mobile-backend/otp/validate-otp)
+- [Resend OTP](/v1/mobile-backend/otp/resend-otp)

@@ -1,0 +1,110 @@
+---
+title: "Primary Backend Quickstart"
+description: "Get started with the Urban Management Primary Backend API"
+---
+
+## Overview
+
+The Urban Management Primary Backend is a comprehensive NestJS-based API that manages the core functionality of the urban management system. It handles user management, building administration, sector organization, and administrative operations.
+
+## Base URL
+
+```
+http://localhost:3001/api/v1
+```
+
+## Key Features
+
+- **Authentication**: Cookie-based JWT authentication with session management
+- **Permission System**: Role-based access control with granular permissions
+- **Rate Limiting**: Built-in throttling with multiple tiers
+- **Data Validation**: Zod schema validation for all inputs
+- **Error Handling**: Standardized error responses with detailed information
+- **Compression**: Gzip compression for responses
+- **CORS**: Configured for frontend integration
+
+## Architecture
+
+The Primary Backend follows a modular architecture with the following key components:
+
+### Controllers
+- **AuthController**: Handles authentication and session management
+- **UsersController**: Manages user CRUD operations
+- **AdminsController**: Handles admin user management
+- **SectorsController**: Manages sector operations
+- **BuildingsController**: Handles building management
+- **FloorsController**: Manages floor operations
+- **UnitsController**: Handles unit management
+- **BlocksController**: Manages block operations
+- **FamilyMembersController**: Handles family member management
+- **VehicleController**: Manages vehicle operations
+- **AddressController**: Handles address management
+- **ImagesController**: Manages image uploads
+- **PermissionsController**: Handles permission management
+
+### Services
+Each controller has a corresponding service that handles business logic and database operations.
+
+### Guards & Middleware
+- **AuthGuard**: Validates authentication tokens
+- **PermissionGuard**: Enforces permission-based access control
+- **LimiterMiddleware**: Implements rate limiting
+- **EnvelopeInterceptor**: Standardizes response format
+- **EnvelopeExceptionFilter**: Standardizes error responses
+
+## Authentication Flow
+
+The Primary Backend uses cookie-based authentication with JWT tokens:
+
+1. **Sign In**: POST `/auth/signin` with credentials
+2. **Session Management**: Automatic cookie handling
+3. **Permission Validation**: Role-based access control
+4. **Sign Out**: POST `/auth/signout` to invalidate session
+
+## Rate Limiting
+
+The API implements multiple rate limiting tiers:
+
+- **Default**: 100 requests per minute
+- **Short**: 3 requests per second
+- **Medium**: 20 requests per 10 seconds
+- **Long**: 100 requests per minute
+
+## Response Format
+
+All responses follow a standardized format:
+
+```json
+{
+  "success": true,
+  "data": { ... },
+  "message": "Operation successful"
+}
+```
+
+Error responses:
+
+```json
+{
+  "success": false,
+  "error": {
+    "message": "Error description",
+    "code": "ERROR_CODE",
+    "details": { ... }
+  }
+}
+```
+
+## Getting Started
+
+1. **Set up environment variables**
+2. **Configure database connection**
+3. **Start the server**: `npm run start:dev`
+4. **Authenticate**: Use the auth endpoints to get session
+5. **Make API calls**: Include session cookie in requests
+
+## Next Steps
+
+- [Authentication Flow](/v1/primary-backend/authentication-flow)
+- [API Patterns](/v1/primary-backend/api-patterns)
+- [User Management](/v1/primary-backend/users/get-users)

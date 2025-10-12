@@ -1,0 +1,62 @@
+---
+title: "Update Role"
+description: "Update role and its permissions"
+---
+
+<Info>Authenticated route</Info>
+## PUT /permissions/roles/uuid
+
+<ResponseField
+  name="uuid"
+  type="param"
+  example="7e11fb1c-4a36-4b35-a168-89cf9f6ab8c1"
+  required
+/>
+
+<Expandable title="Update Schema">
+  <ResponseField
+    name="name"
+    type="string"
+    example="Manager"
+  />
+  <ResponseField
+    name="description"
+    type="string"
+    example="Manager role with limited permissions"
+  />
+  <ResponseField
+    name="permissions"
+    type="string[]"
+    example="['user:read', 'user:write']"
+  >
+    Array of permission strings
+  </ResponseField>
+</Expandable>
+
+### Helpers
+
+Type and schema helpers for parsing and inferring types
+
+```ts RoleWithPermissions
+//? Use this for type infer
+const updateRole: RoleUpdate;
+```
+
+<ResponseExample>
+```json Success
+{
+    "success": true,
+    "data": {
+        "id": "7e11fb1c-4a36-4b35-a168-89cf9f6ab8c1",
+        "name": "Manager",
+        "description": "Manager role with limited permissions",
+        "permissions": [
+            "user:read",
+            "user:write"
+        ],
+        "createdAt": "2025-09-11T13:38:20.424Z",
+        "updatedAt": "2025-09-11T13:38:20.424Z"
+    }
+}
+```
+</ResponseExample>

@@ -1,0 +1,104 @@
+---
+title: "Session Management"
+description: "Create and manage admin sessions"
+---
+
+## Overview
+
+The session endpoint creates a new session for authenticated admin users. This endpoint is used to establish a persistent session after successful authentication.
+
+## Endpoint
+
+```
+POST /api/v1/auth/session
+```
+
+## Request
+
+### Headers
+```http
+Cookie: session=jwt_token_here
+```
+
+### Authentication
+Requires valid session cookie from previous sign-in.
+
+## Response
+
+### Success Response (200 OK)
+
+```json
+{
+  "sessionToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "adminId": "550e8400-e29b-41d4-a716-446655440000",
+  "expiresAt": "2024-01-01T00:00:00Z"
+}
+```
+
+### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `sessionToken` | string | JWT session token |
+| `adminId` | string | Admin user identifier |
+| `expiresAt` | string | Session expiration timestamp |
+
+## Error Responses
+
+### Unauthorized (401 Unauthorized)
+
+```json
+{
+  "success": false,
+  "error": {
+    "message": "Not Logged In",
+    "code": "UNAUTHORIZED",
+    "details": "No valid session found"
+  }
+}
+```
+
+### Invalid Session (401 Unauthorized)
+
+```json
+{
+  "success": false,
+  "error": {
+    "message": "Invalid or expired session",
+    "code": "INVALID_SESSION",
+    "details": "Session token is invalid or expired"
+  }
+}
+```
+
+## Example Usage
+
+### JavaScript/Fetch
+
+```javascript
+const createSession = async () => {
+  try {
+    const response = await fetch('/api/v1/auth/session', {
+      method: 'POST',
+      credentials: 'include', // Important for cookies
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error.message);
+    }
+
+    const session = await response.json();
+    return session;
+  } catch (error) {
+    console.error('Session creation failed:', error.message);
+    throw error;
+  }
+};
+```
+
+## Related Endpoints
+
+- [Sign In](/v1/primary-backend/auth/signin)
+- [Sign Out](/v1/primary-backend/auth/signout)
+- [Validate Session](/v1/primary-backend/auth/validate-session)

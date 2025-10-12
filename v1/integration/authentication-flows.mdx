@@ -1,0 +1,356 @@
+---
+title: "Authentication Flows"
+description: "Understanding authentication flows for both Primary and Mobile backends"
+---
+
+## Overview
+
+The Urban Management system uses two different authentication flows optimized for their respective use cases. Understanding both flows is essential for proper integration.
+
+## Primary Backend Authentication
+
+### Flow Overview
+
+<Mermaid>
+sequenceDiagram
+    participant Client
+    participant PrimaryBackend
+    participant Database
+
+    Client->>PrimaryBackend: POST /auth/signin (email, password)
+    PrimaryBackend->>Database: validateAdminCredentials()
+    Database-->>PrimaryBackend: admin data
+    PrimaryBackend->>PrimaryBackend: generateJWT()
+    PrimaryBackend-->>Client: Set cookie + admin data
+    
+    Note over Client: Subsequent requests include cookie
+    
+    Client->>PrimaryBackend: Request with cookie
+    PrimaryBackend->>Database: validateSession()
+    Database-->>PrimaryBackend: session valid
+    PrimaryBackend-->>Client: Protected resource
+</Mermaid>
+
+### Key Features
+- **Cookie-based**: Uses HTTP-only cookies for security
+- **Email/Password**: Traditional authentication method
+- **Session Management**: Database-backed session tracking
+- **Permission System**: Role-based access control
+
+### Implementation
+
+```javascript
+// Primary Backend Authentication
+class PrimaryAuth {
+  async signIn(email, password) {
+    const response = await fetch('http://localhost:3001/api/v1/auth/signin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include', // Important for cookies
+      body: JSON.stringify({ email, password })
+    });
+    
+    return response.json();
+  }
+  
+  async makeRequest(endpoint, options = {}) {
+    return fetch(`http://localhost:3001/api/v1${endpoint}`, {
+      credentials: 'include', // Include cookies
+      ...options
+    });
+  }
+}
+```
+
+## Mobile Backend Authentication
+
+### Flow Overview
+
+<Mermaid>
+sequenceDiagram
+    participant Mobile
+    participant MobileBackend
+    participant SMS
+    participant Database
+
+    Mobile->>MobileBackend: POST /auth/signin (phone)
+    MobileBackend->>Database: findOrCreateUser()
+    Database-->>MobileBackend: user data
+    MobileBackend-->>Mobile: user + accessToken
+    
+    Mobile->>MobileBackend: POST /auth/otp/create
+    MobileBackend->>SMS: sendOTP()
+    SMS-->>MobileBackend: OTP sent
+    MobileBackend-->>Mobile: confirmation
+    
+    Mobile->>MobileBackend: POST /auth/otp/validate (otp)
+    MobileBackend->>Database: verifyOTP()
+    Database-->>MobileBackend: OTP valid
+    MobileBackend-->>Mobile: sessionToken
+    
+    Note over Mobile: Use sessionToken for API calls
+    
+    Mobile->>MobileBackend: Request with Bearer token
+    MobileBackend->>Database: validateSession()
+    Database-->>MobileBackend: session valid
+    MobileBackend-->>Mobile: Protected resource
+</Mermaid>
+
+### Key Features
+- **Phone-based**: Uses phone numbers for identification
+- **OTP Verification**: SMS-based one-time passwords
+- **Bearer Tokens**: Header-based authentication
+- **Mobile Optimized**: Lightweight and fast
+
+### Implementation
+
+```javascript
+// Mobile Backend Authentication
+class MobileAuth {
+  async signIn(phoneNumber) {
+    const response = await fetch('http://localhost:3002/api/v1/auth/signin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phoneNumber })
+    });
+    
+    const data = await response.json();
+    // Store access token for OTP operations
+    localStorage.setItem('accessToken', data.accessToken);
+    return data;
+  }
+  
+  async createOTP() {
+    const token = localStorage.getItem('accessToken');
+    const response = await fetch('http://localhost:3002/api/v1/auth/otp/create', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    return response.json();
+  }
+  
+  async validateOTP(otp) {
+    const token = localStorage.getItem('accessToken');
+    const response = await fetch('http://localhost:3002/api/v1/auth/otp/validate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ otp })
+    });
+    
+    const data = await response.json();
+    // Store session token for API calls
+    localStorage.setItem('sessionToken', data.sessionToken);
+    return data;
+  }
+  
+  async makeRequest(endpoint, options = {}) {
+    const token = localStorage.getItem('sessionToken');
+    return fetch(`http://localhost:3002/api/v1${endpoint}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        ...options.headers
+      },
+      ...options
+    });
+  }
+}
+```
+
+## Dual Backend Integration
+
+### When to Use Which Backend
+
+#### Primary Backend
+- **Admin Operations**: User management, building administration
+- **Web Applications**: Dashboard, admin panel
+- **Complex Queries**: Advanced filtering, reporting
+- **File Operations**: Image uploads, document management
+
+#### Mobile Backend
+- **User Operations**: Profile management, basic queries
+- **Mobile Applications**: Resident apps, visitor apps
+- **Simple Operations**: Lightweight, fast responses
+- **Phone-based Auth**: When email/password isn't suitable
+
+### Cross-Backend Communication
+
+```javascript
+// Unified API Client
+class UrbanManagementAPI {
+  constructor() {
+    this.primaryAPI = 'http://localhost:3001/api/v1';
+    this.mobileAPI = 'http://localhost:3002/api/v1';
+  }
+  
+  // Admin operations (Primary Backend)
+  async adminSignIn(email, password) {
+    return this.primaryAuth.signIn(email, password);
+  }
+  
+  async getUsers(filters = {}) {
+    return this.primaryAuth.makeRequest('/users', {
+      method: 'GET',
+      // Add query parameters
+    });
+  }
+  
+  // Mobile operations (Mobile Backend)
+  async mobileSignIn(phoneNumber) {
+    return this.mobileAuth.signIn(phoneNumber);
+  }
+  
+  async getCurrentUser() {
+    return this.mobileAuth.makeRequest('/users/current');
+  }
+  
+  // Hybrid operations
+  async syncUserData(userId) {
+    // Get user from primary backend (admin view)
+    const adminView = await this.getUsers({ id: userId });
+    
+    // Get user from mobile backend (user view)
+    const userView = await this.getCurrentUser();
+    
+    return { adminView, userView };
+  }
+}
+```
+
+## Security Considerations
+
+### Token Management
+
+#### Primary Backend
+- **HttpOnly Cookies**: Prevents XSS attacks
+- **Secure Flag**: HTTPS only in production
+- **SameSite**: CSRF protection
+- **Database Validation**: Server-side session validation
+
+#### Mobile Backend
+- **Secure Storage**: Use platform-specific secure storage
+- **Token Expiration**: Handle token expiration gracefully
+- **Refresh Logic**: Implement automatic token refresh
+- **Biometric Auth**: Consider biometric authentication
+
+### Best Practices
+
+```javascript
+// Secure token storage (React Native)
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Keychain from 'react-native-keychain';
+
+class SecureTokenManager {
+  async storeToken(token, type = 'session') {
+    try {
+      // Use Keychain for sensitive data
+      await Keychain.setInternetCredentials(
+        `urban_mgmt_${type}`,
+        'token',
+        token
+      );
+    } catch (error) {
+      // Fallback to AsyncStorage
+      await AsyncStorage.setItem(`${type}Token`, token);
+    }
+  }
+  
+  async getToken(type = 'session') {
+    try {
+      const credentials = await Keychain.getInternetCredentials(
+        `urban_mgmt_${type}`
+      );
+      return credentials ? credentials.password : null;
+    } catch (error) {
+      // Fallback to AsyncStorage
+      return await AsyncStorage.getItem(`${type}Token`);
+    }
+  }
+}
+```
+
+## Error Handling
+
+### Authentication Errors
+
+```javascript
+class AuthErrorHandler {
+  static handle(error) {
+    switch (error.code) {
+      case 'UNAUTHORIZED':
+        // Redirect to login
+        this.redirectToLogin();
+        break;
+      case 'SESSION_EXPIRED':
+        // Try to refresh token
+        this.refreshToken();
+        break;
+      case 'INVALID_CREDENTIALS':
+        // Show login error
+        this.showLoginError(error.message);
+        break;
+      case 'OTP_EXPIRED':
+        // Request new OTP
+        this.requestNewOTP();
+        break;
+      default:
+        // Show generic error
+        this.showGenericError(error.message);
+    }
+  }
+}
+```
+
+## Testing Strategies
+
+### Unit Tests
+
+```javascript
+describe('Authentication Flows', () => {
+  describe('Primary Backend', () => {
+    it('should authenticate admin user', async () => {
+      const auth = new PrimaryAuth();
+      const result = await auth.signIn('admin@example.com', 'password');
+      
+      expect(result.id).toBeDefined();
+      expect(result.email).toBe('admin@example.com');
+    });
+  });
+  
+  describe('Mobile Backend', () => {
+    it('should authenticate mobile user', async () => {
+      const auth = new MobileAuth();
+      const result = await auth.signIn('+1234567890');
+      
+      expect(result.user.id).toBeDefined();
+      expect(result.accessToken).toBeDefined();
+    });
+  });
+});
+```
+
+### Integration Tests
+
+```javascript
+describe('Cross-Backend Integration', () => {
+  it('should sync user data between backends', async () => {
+    const api = new UrbanManagementAPI();
+    
+    // Create user via primary backend
+    const user = await api.createUser(userData);
+    
+    // Verify user can authenticate via mobile backend
+    const mobileAuth = await api.mobileSignIn(user.phoneNumber);
+    expect(mobileAuth.user.id).toBe(user.id);
+  });
+});
+```
+
+## Related Guides
+
+- [Integration Overview](/v1/integration/overview)
+- [Error Handling](/v1/integration/error-handling)
+- [Rate Limiting](/v1/integration/rate-limiting)

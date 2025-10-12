@@ -1,0 +1,108 @@
+---
+title: "Get Current User"
+description: "Retrieve the currently authenticated mobile user"
+---
+
+## Overview
+
+The get current user endpoint retrieves information about the currently authenticated mobile user based on their session token.
+
+## Endpoint
+
+```
+GET /api/v1/users/current
+```
+
+## Request
+
+### Headers
+```http
+Authorization: Bearer {session_token}
+```
+
+### Authentication
+Requires valid session token.
+
+## Response
+
+### Success Response (200 OK)
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "phoneNumber": "+1234567890",
+  "isActive": true,
+  "createdAt": "2024-01-01T00:00:00Z",
+  "updatedAt": "2024-01-01T00:00:00Z"
+}
+```
+
+## Example Usage
+
+### JavaScript/Fetch
+
+```javascript
+const getCurrentUser = async (sessionToken) => {
+  try {
+    const response = await fetch('/api/v1/users/current', {
+      headers: {
+        'Authorization': `Bearer ${sessionToken}`,
+      }
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error.message);
+    }
+
+    const user = await response.json();
+    return user;
+  } catch (error) {
+    console.error('Failed to get current user:', error.message);
+    throw error;
+  }
+};
+```
+
+### React Native Hook
+
+```javascript
+import { useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+export const useCurrentUser = () => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const sessionToken = await AsyncStorage.getItem('sessionToken');
+        if (!sessionToken) {
+          throw new Error('No session token found');
+        }
+        
+        const userData = await getCurrentUser(sessionToken);
+        setUser(userData);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCurrentUser();
+  }, []);
+
+  return { user, loading, error };
+};
+```
+
+## Related Endpoints
+
+- [Get User by ID](/v1/mobile-backend/users/get-user-by-id)
+- [Phone Sign In](/v1/mobile-backend/auth/signin)

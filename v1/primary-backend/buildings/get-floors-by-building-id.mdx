@@ -1,0 +1,40 @@
+---
+title: "Get Floors by Building ID"
+description: "Get all floors in a specific building"
+---
+
+<Info>Authenticated route</Info>
+## GET /sectors/buildings/uuid/floors
+
+<ResponseField
+  name="uuid"
+  type="param"
+  example="7e11fb1c-4a36-4b35-a168-89cf9f6ab8c1"
+  required
+/>
+
+### Helpers
+
+Type and schema helpers for parsing and inferring types
+
+```ts Floor
+//? Use this for type infer
+const floorData: Floor;
+```
+
+<ResponseExample>
+```json Success
+{
+    "success": true,
+    "data": [
+        {
+            "id": "7e11fb1c-4a36-4b35-a168-89cf9f6ab8c2",
+            "floorNumber": 1,
+            "buildingId": "7e11fb1c-4a36-4b35-a168-89cf9f6ab8c1",
+            "createdAt": "2025-09-11T13:38:20.424Z",
+            "updatedAt": "2025-09-11T13:38:20.424Z"
+        }
+    ]
+}
+```
+</ResponseExample>

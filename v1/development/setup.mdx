@@ -1,0 +1,400 @@
+---
+title: "Development Setup"
+description: "Complete setup guide for Urban Management development environment"
+---
+
+## Overview
+
+This guide covers setting up the Urban Management development environment, including both Primary and Mobile backends.
+
+## Prerequisites
+
+### Required Software
+- **Node.js**: Version 20.0.0 or higher
+- **pnpm**: Package manager (recommended)
+- **PostgreSQL**: Database server
+- **Git**: Version control
+
+### Development Tools
+- **VS Code**: Recommended IDE
+- **Postman/Insomnia**: API testing
+- **Docker**: Optional, for containerized development
+
+## Project Structure
+
+```
+urban-management/
+├── apps/
+│   ├── primary-backend/     # Admin API (Port 3001)
+│   ├── mobile-backend/       # Mobile API (Port 3002)
+│   ├── dashboard/           # Web dashboard
+│   └── mobile/              # Mobile app
+├── packages/
+│   ├── database/            # Shared database package
+│   ├── backend/             # Shared backend utilities
+│   ├── types/               # Shared TypeScript types
+│   └── ui/                  # Shared UI components
+└── docs/                    # Documentation
+```
+
+## Installation
+
+### 1. Clone Repository
+
+```bash
+git clone https://github.com/dilshad-khalil/urban-managment.git
+cd urban-managment
+```
+
+### 2. Install Dependencies
+
+```bash
+# Install all dependencies using pnpm
+pnpm install
+
+# Or using npm
+npm install
+```
+
+### 3. Environment Setup
+
+#### Primary Backend Environment
+
+Create `.env` file in `apps/primary-backend/`:
+
+```env
+# Database
+DATABASE_URL=postgresql://username:password@localhost:5432/urban_management
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_NAME=urban_management
+DATABASE_USER=username
+DATABASE_PASSWORD=password
+
+# JWT
+JWT_SECRET=your-super-secret-jwt-key-here
+JWT_EXPIRE=7d
+
+# Server
+PORT=3001
+NODE_ENV=development
+
+# CORS
+CORS_ORIGIN=http://localhost:3000
+
+# File Storage (BackBlaze)
+BACKBLAZE_KEY_ID=your-backblaze-key-id
+BACKBLAZE_APPLICATION_KEY=your-backblaze-app-key
+BACKBLAZE_BUCKET_NAME=your-bucket-name
+```
+
+#### Mobile Backend Environment
+
+Create `.env` file in `apps/mobile-backend/`:
+
+```env
+# Database
+DATABASE_URL=postgresql://username:password@localhost:5432/urban_management_mobile
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_NAME=urban_management_mobile
+DATABASE_USER=username
+DATABASE_PASSWORD=password
+
+# JWT
+JWT_SECRET=your-mobile-jwt-secret-key-here
+JWT_EXPIRE=7d
+
+# Server
+PORT=3002
+NODE_ENV=development
+
+# SMS Service (Twilio example)
+TWILIO_ACCOUNT_SID=your-twilio-account-sid
+TWILIO_AUTH_TOKEN=your-twilio-auth-token
+TWILIO_PHONE_NUMBER=+1234567890
+```
+
+## Database Setup
+
+### 1. Install PostgreSQL
+
+#### macOS (using Homebrew)
+```bash
+brew install postgresql
+brew services start postgresql
+```
+
+#### Ubuntu/Debian
+```bash
+sudo apt update
+sudo apt install postgresql postgresql-contrib
+sudo systemctl start postgresql
+```
+
+#### Windows
+Download and install from [PostgreSQL website](https://www.postgresql.org/download/windows/)
+
+### 2. Create Databases
+
+```sql
+-- Connect to PostgreSQL
+psql -U postgres
+
+-- Create databases
+CREATE DATABASE urban_management;
+CREATE DATABASE urban_management_mobile;
+
+-- Create users (optional)
+CREATE USER urban_admin WITH PASSWORD 'your_password';
+GRANT ALL PRIVILEGES ON DATABASE urban_management TO urban_admin;
+GRANT ALL PRIVILEGES ON DATABASE urban_management_mobile TO urban_admin;
+```
+
+### 3. Run Migrations
+
+```bash
+# Primary Backend migrations
+cd apps/primary-backend
+pnpm run db:migrate
+
+# Mobile Backend migrations
+cd apps/mobile-backend
+pnpm run db:migrate
+```
+
+## Running the Development Servers
+
+### Start All Services
+
+```bash
+# From project root
+pnpm run dev
+
+# This will start:
+# - Primary Backend (http://localhost:3001)
+# - Mobile Backend (http://localhost:3002)
+# - Dashboard (http://localhost:3000)
+```
+
+### Start Individual Services
+
+```bash
+# Primary Backend only
+cd apps/primary-backend
+pnpm run start:dev
+
+# Mobile Backend only
+cd apps/mobile-backend
+pnpm run start:dev
+
+# Dashboard only
+cd apps/dashboard
+pnpm run dev
+```
+
+## Development Workflow
+
+### 1. Code Structure
+
+#### Primary Backend
+```
+apps/primary-backend/src/
+├── auth/                    # Authentication
+├── users/                   # User management
+├── admins/                  # Admin management
+├── sectors/                 # Sector management
+├── buildings/               # Building management
+├── floors/                  # Floor management
+├── units/                   # Unit management
+├── blocks/                  # Block management
+├── family-members/          # Family member management
+├── vehicle/                 # Vehicle management
+├── address/                 # Address management
+├── images/                  # Image management
+├── permissions/             # Permission management
+├── middlewares/             # Custom middlewares
+├── guards/                  # Authentication guards
+└── decorators/              # Custom decorators
+```
+
+#### Mobile Backend
+```
+apps/mobile-backend/src/
+├── auth/                    # Authentication & OTP
+├── users/                   # User management
+├── middlewares/             # Custom middlewares
+└── guards/                  # Authentication guards
+```
+
+### 2. Adding New Features
+
+#### Primary Backend
+1. Create controller in appropriate module
+2. Create service for business logic
+3. Add routes to module
+4. Update app.module.ts
+5. Add tests
+6. Update documentation
+
+#### Mobile Backend
+1. Create controller in appropriate module
+2. Create service for business logic
+3. Add routes to module
+4. Update app.module.ts
+5. Add tests
+6. Update documentation
+
+### 3. Testing
+
+```bash
+# Run all tests
+pnpm run test
+
+# Run tests for specific app
+cd apps/primary-backend
+pnpm run test
+
+# Run tests with coverage
+pnpm run test:cov
+
+# Run e2e tests
+pnpm run test:e2e
+```
+
+## API Testing
+
+### Using Postman
+
+1. **Import Collection**: Import the provided Postman collection
+2. **Set Environment Variables**:
+   - `base_url_primary`: `http://localhost:3001/api/v1`
+   - `base_url_mobile`: `http://localhost:3002/api/v1`
+3. **Test Authentication**: Start with auth endpoints
+4. **Test Protected Endpoints**: Use session tokens
+
+### Using cURL
+
+```bash
+# Primary Backend - Admin Sign In
+curl -X POST http://localhost:3001/api/v1/auth/signin \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@example.com","password":"password123"}' \
+  -c cookies.txt
+
+# Mobile Backend - Phone Sign In
+curl -X POST http://localhost:3002/api/v1/auth/signin \
+  -H "Content-Type: application/json" \
+  -d '{"phoneNumber":"+1234567890"}'
+```
+
+## Debugging
+
+### VS Code Configuration
+
+Create `.vscode/launch.json`:
+
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Primary Backend Debug",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/apps/primary-backend/src/main.ts",
+      "outFiles": ["${workspaceFolder}/apps/primary-backend/dist/**/*.js"],
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "runtimeArgs": ["-r", "ts-node/register"]
+    },
+    {
+      "name": "Mobile Backend Debug",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/apps/mobile-backend/src/main.ts",
+      "outFiles": ["${workspaceFolder}/apps/mobile-backend/dist/**/*.js"],
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "runtimeArgs": ["-r", "ts-node/register"]
+    }
+  ]
+}
+```
+
+### Logging
+
+Both backends use structured logging:
+
+```typescript
+// Example logging in services
+import { Logger } from '@nestjs/common';
+
+@Injectable()
+export class UsersService {
+  private readonly logger = new Logger(UsersService.name);
+
+  async createUser(userData: CreateUserDto) {
+    this.logger.log(`Creating user: ${userData.email}`);
+    
+    try {
+      const user = await this.userRepository.create(userData);
+      this.logger.log(`User created successfully: ${user.id}`);
+      return user;
+    } catch (error) {
+      this.logger.error(`Failed to create user: ${error.message}`, error.stack);
+      throw error;
+    }
+  }
+}
+```
+
+## Common Issues
+
+### Port Conflicts
+```bash
+# Check what's using port 3001
+lsof -i :3001
+
+# Kill process if needed
+kill -9 <PID>
+```
+
+### Database Connection Issues
+```bash
+# Check PostgreSQL status
+brew services list | grep postgresql
+
+# Restart PostgreSQL
+brew services restart postgresql
+```
+
+### Permission Issues
+```bash
+# Fix npm permissions
+sudo chown -R $(whoami) ~/.npm
+```
+
+## Production Deployment
+
+### Environment Variables
+- Set `NODE_ENV=production`
+- Use strong JWT secrets
+- Configure production database URLs
+- Set up proper CORS origins
+
+### Security Checklist
+- [ ] Strong JWT secrets
+- [ ] HTTPS enabled
+- [ ] Database credentials secured
+- [ ] Rate limiting configured
+- [ ] CORS properly configured
+- [ ] File upload limits set
+
+## Related Guides
+
+- [Database Setup](/v1/development/database-setup)
+- [Environment Configuration](/v1/development/environment-config)
+- [Testing](/v1/development/testing)

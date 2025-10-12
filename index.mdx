@@ -1,25 +1,145 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for urban management documentation, see full guides on how to work with urban management apis and api flows"
+title: "Urban Management API Documentation"
+description: "Comprehensive documentation for the Urban Management system APIs, including Primary Backend, Mobile Backend, and integration guides"
 ---
 
-## Select a Project
+## Welcome to Urban Management
 
-Select which project documentation you want to see.
+The Urban Management system provides a complete solution for managing urban infrastructure, residents, and administrative operations. Our system consists of two main backends designed to serve different use cases while maintaining data consistency and security.
 
-<Columns cols={2}>
+## System Overview
+
+<Mermaid>
+graph TB
+    subgraph "Urban Management System"
+        A[Primary Backend<br/>Admin Operations]
+        B[Mobile Backend<br/>User Operations]
+        C[Shared Database]
+        D[File Storage]
+    end
+    
+    subgraph "Client Applications"
+        E[Web Dashboard]
+        F[Mobile App]
+        G[Admin Panel]
+    end
+    
+    E --> A
+    G --> A
+    F --> B
+    
+    A --> C
+    B --> C
+    A --> D
+</Mermaid>
+
+## Choose Your Integration Path
+
+<Columns cols={3}>
   <Card
-    title="Central Backend"
-    icon="globe"
-    href="/v1/central-backend/quickstart"
+    title="Primary Backend"
+    icon="server"
+    href="/v1/primary-backend/quickstart"
   >
-    Quick guides for the Central Backend APIs—endpoints and examples.
+    Comprehensive admin API for managing users, buildings, sectors, and all administrative operations. Features cookie-based authentication and role-based permissions.
   </Card>
   <Card
-    title="Mobile backend"
-    icon="tablet-smartphone"
+    title="Mobile Backend"
+    icon="smartphone"
     href="/v1/mobile-backend/quickstart"
   >
-    Quick guides for the Mobile Backend APIs—endpoints and examples.
+    Mobile-optimized API with phone-based authentication and OTP verification. Designed for resident-facing applications and mobile apps.
+  </Card>
+  <Card
+    title="Integration Guides"
+    icon="link"
+    href="/v1/integration/overview"
+  >
+    Complete integration guides covering authentication flows, error handling, rate limiting, and best practices for both backends.
   </Card>
 </Columns>
+
+## Quick Start
+
+### For Web Applications
+If you're building a web dashboard or admin panel:
+
+1. **Start with Primary Backend**: [Quickstart Guide](/v1/primary-backend/quickstart)
+2. **Understand Authentication**: [Authentication Flow](/v1/primary-backend/authentication-flow)
+3. **Learn API Patterns**: [API Patterns](/v1/primary-backend/api-patterns)
+
+### For Mobile Applications
+If you're building a mobile app for residents:
+
+1. **Start with Mobile Backend**: [Quickstart Guide](/v1/mobile-backend/quickstart)
+2. **Understand Phone Auth**: [Authentication Flow](/v1/mobile-backend/authentication-flow)
+3. **Learn OTP System**: [OTP Management](/v1/mobile-backend/otp/create-otp)
+
+### For Full Integration
+If you need to integrate both systems:
+
+1. **Read Integration Overview**: [Integration Guide](/v1/integration/overview)
+2. **Understand Authentication Flows**: [Authentication Flows](/v1/integration/authentication-flows)
+3. **Learn Error Handling**: [Error Handling](/v1/integration/error-handling)
+
+## Key Features
+
+### Primary Backend Features
+- **Admin Management**: Complete CRUD operations for administrators
+- **User Management**: Comprehensive user lifecycle management
+- **Building Management**: Sector, building, floor, and unit management
+- **Permission System**: Granular role-based access control
+- **File Uploads**: Image and document management
+- **Advanced Queries**: Pagination, filtering, and sorting
+
+### Mobile Backend Features
+- **Phone Authentication**: Phone number-based user identification
+- **OTP Verification**: SMS-based one-time password system
+- **Session Management**: Secure token-based sessions
+- **Mobile Optimization**: Lightweight responses and mobile-friendly endpoints
+- **User Profile**: Basic user information management
+
+## Architecture Highlights
+
+### Security
+- **JWT Tokens**: Secure token-based authentication
+- **Session Management**: Database-backed session tracking
+- **Rate Limiting**: Protection against abuse and DDoS
+- **Input Validation**: Comprehensive data validation using Zod schemas
+- **CORS Protection**: Configured for secure cross-origin requests
+
+### Performance
+- **Compression**: Gzip compression for all responses
+- **Caching**: Built-in response caching strategies
+- **Pagination**: Efficient data pagination for large datasets
+- **Database Optimization**: Optimized queries and indexing
+
+### Scalability
+- **Modular Architecture**: Microservice-ready design
+- **Shared Database**: Consistent data across both backends
+- **Event-Driven**: Internal event system for data synchronization
+- **Container Ready**: Docker and Kubernetes compatible
+
+## Getting Help
+
+### Documentation Structure
+- **Quickstart Guides**: Get up and running quickly
+- **API Reference**: Complete endpoint documentation
+- **Integration Guides**: Best practices and patterns
+- **Development Guides**: Setup and configuration
+
+### Support Resources
+- **GitHub Repository**: [Urban Management Repository](https://github.com/dilshad-khalil/urban-managment)
+- **Issue Tracking**: Report bugs and request features
+- **Community**: Join our developer community
+
+## Recent Updates
+
+<Note>
+**Latest Version**: v1.0.0
+- Complete API documentation overhaul
+- Enhanced authentication flows
+- Improved error handling
+- Added comprehensive integration guides
+- Mobile backend optimization
+</Note>

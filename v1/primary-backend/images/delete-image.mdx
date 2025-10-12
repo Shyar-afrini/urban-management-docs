@@ -1,0 +1,27 @@
+---
+title: "Delete Image"
+description: "Delete image by URL"
+---
+
+<Info>Authenticated route</Info>
+## DELETE /images
+
+<Expandable title="Delete Schema">
+  <ResponseField
+    name="url"
+    type="string"
+    example="https://example.com/images/image.jpg"
+    required
+  >
+    URL of the image to delete
+  </ResponseField>
+</Expandable>
+
+<ResponseExample>
+```json Success
+{
+    "success": true,
+    "data": "Image deleted successfully"
+}
+```
+</ResponseExample>

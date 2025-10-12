@@ -17,72 +17,158 @@
   "navigation": {
     "versions": [
       {
-        "version": "Central Backend",
+        "version": "Primary Backend",
         "groups": [
           {
-            "group": "Authorization",
+            "group": "Getting Started",
             "pages": [
-              "v1/central-backend/Authorization/signin",
-              "v1/central-backend/Authorization/signout",
-              "v1/central-backend/Authorization/validate-session"
+              "v1/primary-backend/quickstart",
+              "v1/primary-backend/authentication-flow",
+              "v1/primary-backend/api-patterns"
             ]
           },
           {
-            "group": "Users",
+            "group": "Authentication",
             "pages": [
-              "v1/central-backend/Users/get-users",
-              "v1/central-backend/Users/get-user-by-id",
-              "v1/central-backend/Users/get-user-by-phone-number",
-              "v1/central-backend/Users/create-user",
-              "v1/central-backend/Users/update-user",
-              "v1/central-backend/Users/deactivate-user",
-              "v1/central-backend/Users/activate-user",
-              "v1/central-backend/Users/delete-user"
+              "v1/primary-backend/auth/signin",
+              "v1/primary-backend/auth/signout",
+              "v1/primary-backend/auth/session",
+              "v1/primary-backend/auth/validate-session"
             ]
           },
           {
-            "group": "Admins",
+            "group": "User Management",
             "pages": [
-              "v1/central-backend/Admins/get-admins",
-              "v1/central-backend/Admins/get-admin-by-id",
-              "v1/central-backend/Admins/get-current-session",
-              "v1/central-backend/Admins/create-admin",
-              "v1/central-backend/Admins/update-admin",
-              "v1/central-backend/Admins/change-admin-password",
-              "v1/central-backend/Admins/deactivate-admin",
-              "v1/central-backend/Admins/activate-admin",
-              "v1/central-backend/Admins/delete-admin"
+              "v1/primary-backend/users/get-users",
+              "v1/primary-backend/users/get-user-by-id",
+              "v1/primary-backend/users/get-user-by-phone",
+              "v1/primary-backend/users/create-user",
+              "v1/primary-backend/users/update-user",
+              "v1/primary-backend/users/activate-user",
+              "v1/primary-backend/users/deactivate-user",
+              "v1/primary-backend/users/delete-user",
+              "v1/primary-backend/users/get-user-vehicle"
             ]
           },
           {
-            "group": "Sectors",
+            "group": "Admin Management",
             "pages": [
-              "v1/central-backend/sectors/get-all-sectors",
-              "v1/central-backend/sectors/create-sector",
-              "v1/central-backend/sectors/update-sector",
-              "v1/central-backend/sectors/delete-sector"
+              "v1/primary-backend/admins/get-admins",
+              "v1/primary-backend/admins/get-admin-by-id",
+              "v1/primary-backend/admins/get-current-session",
+              "v1/primary-backend/admins/create-admin",
+              "v1/primary-backend/admins/update-admin",
+              "v1/primary-backend/admins/change-admin-password",
+              "v1/primary-backend/admins/activate-admin",
+              "v1/primary-backend/admins/deactivate-admin",
+              "v1/primary-backend/admins/delete-admin"
             ]
           },
           {
-            "group": "Buildings",
+            "group": "Sector Management",
             "pages": [
-              "v1/central-backend/sectors/Buildings/get-all-buildings",
-              "v1/central-backend/sectors/Buildings/get-building-by-id",
-              "v1/central-backend/sectors/Buildings/get-buildings-by-sector-id",
-              "v1/central-backend/sectors/Buildings/create-building",
-              "v1/central-backend/sectors/Buildings/update-building",
-              "v1/central-backend/sectors/Buildings/delete-building",
-              {
-                "group": "Floors",
-                "pages": [
-                  "v1/central-backend/sectors/Buildings/Floors/get-floors-by-building-id",
-                  "v1/central-backend/sectors/Buildings/Floors/get-units-by-floor-id",
-                  "v1/central-backend/sectors/Buildings/Floors/get-floor-by-id",
-                  "v1/central-backend/sectors/Buildings/Floors/create-new-floor",
-                  "v1/central-backend/sectors/Buildings/Floors/update-floor",
-                  "v1/central-backend/sectors/Buildings/Floors/delete-floor"
-                ]
-              }
+              "v1/primary-backend/sectors/get-sectors",
+              "v1/primary-backend/sectors/create-sector",
+              "v1/primary-backend/sectors/update-sector",
+              "v1/primary-backend/sectors/delete-sector",
+              "v1/primary-backend/sectors/get-buildings-by-sector-id"
+            ]
+          },
+          {
+            "group": "Building Management",
+            "pages": [
+              "v1/primary-backend/buildings/get-buildings",
+              "v1/primary-backend/buildings/get-building-by-id",
+              "v1/primary-backend/buildings/create-building",
+              "v1/primary-backend/buildings/update-building",
+              "v1/primary-backend/buildings/delete-building",
+              "v1/primary-backend/buildings/get-floors-by-building-id"
+            ]
+          },
+          {
+            "group": "Floor Management",
+            "pages": [
+              "v1/primary-backend/floors/get-floors-by-building-id",
+              "v1/primary-backend/floors/get-floor-by-id",
+              "v1/primary-backend/floors/create-floor",
+              "v1/primary-backend/floors/update-floor",
+              "v1/primary-backend/floors/delete-floor",
+              "v1/primary-backend/floors/get-units-by-floor-id"
+            ]
+          },
+          {
+            "group": "Unit Management",
+            "pages": [
+              "v1/primary-backend/units/get-units",
+              "v1/primary-backend/units/get-unit-by-id",
+              "v1/primary-backend/units/create-unit",
+              "v1/primary-backend/units/update-unit",
+              "v1/primary-backend/units/delete-unit"
+            ]
+          },
+          {
+            "group": "Block Management",
+            "pages": [
+              "v1/primary-backend/blocks/get-blocks",
+              "v1/primary-backend/blocks/get-block-by-id",
+              "v1/primary-backend/blocks/create-block",
+              "v1/primary-backend/blocks/update-block",
+              "v1/primary-backend/blocks/delete-block",
+              "v1/primary-backend/blocks/get-units-by-block-id"
+            ]
+          },
+          {
+            "group": "Family Management",
+            "pages": [
+              "v1/primary-backend/family-members/get-family-members",
+              "v1/primary-backend/family-members/get-family-member-by-id",
+              "v1/primary-backend/family-members/create-family-member",
+              "v1/primary-backend/family-members/update-family-member",
+              "v1/primary-backend/family-members/delete-family-member"
+            ]
+          },
+          {
+            "group": "Vehicle Management",
+            "pages": [
+              "v1/primary-backend/vehicles/get-vehicles",
+              "v1/primary-backend/vehicles/get-vehicle-by-id",
+              "v1/primary-backend/vehicles/create-vehicle",
+              "v1/primary-backend/vehicles/update-vehicle",
+              "v1/primary-backend/vehicles/delete-vehicle"
+            ]
+          },
+          {
+            "group": "Address Management",
+            "pages": [
+              "v1/primary-backend/addresses/get-addresses",
+              "v1/primary-backend/addresses/get-address-by-id",
+              "v1/primary-backend/addresses/create-address",
+              "v1/primary-backend/addresses/update-address",
+              "v1/primary-backend/addresses/delete-address"
+            ]
+          },
+          {
+            "group": "Image Management",
+            "pages": [
+              "v1/primary-backend/images/upload-image",
+              "v1/primary-backend/images/get-image",
+              "v1/primary-backend/images/delete-image"
+            ]
+          },
+          {
+            "group": "Permission Management",
+            "pages": [
+              "v1/primary-backend/permissions/get-permissions",
+              "v1/primary-backend/permissions/get-available-permissions",
+              "v1/primary-backend/permissions/get-role-presets",
+              "v1/primary-backend/permissions/get-all-roles",
+              "v1/primary-backend/permissions/get-role-by-id",
+              "v1/primary-backend/permissions/create-role",
+              "v1/primary-backend/permissions/update-role",
+              "v1/primary-backend/permissions/delete-role",
+              "v1/primary-backend/permissions/add-permissions-to-role",
+              "v1/primary-backend/permissions/remove-permissions-from-role",
+              "v1/primary-backend/permissions/create-role-from-preset"
             ]
           }
         ]
@@ -91,69 +177,63 @@
         "version": "Mobile Backend",
         "groups": [
           {
-            "group": "Mobile Backend",
-            "pages": ["v1/mobile-backend/quickstart"]
+            "group": "Getting Started",
+            "pages": [
+              "v1/mobile-backend/quickstart",
+              "v1/mobile-backend/authentication-flow",
+              "v1/mobile-backend/api-patterns"
+            ]
           },
           {
-            "tag": "Start Here",
-            "group": "Authorization",
+            "group": "Authentication",
             "pages": [
-              "/v1/mobile-backend/authorization/signin",
-              "/v1/mobile-backend/authorization/signout",
-              {
-                "group": "Session",
-                "pages": [
-                  "/v1/mobile-backend/authorization/session/request-new-session",
-                  "/v1/mobile-backend/authorization/session/validate-session"
-                ]
-              },
-              {
-                "group": "OTP",
-                "pages": [
-                  "/v1/mobile-backend/authorization/otp/create-otp",
-                  "/v1/mobile-backend/authorization/otp/resend-otp",
-                  "/v1/mobile-backend/authorization/otp/validate-otp"
-                ]
-              }
+              "v1/mobile-backend/auth/signin",
+              "v1/mobile-backend/auth/signout",
+              "v1/mobile-backend/auth/session",
+              "v1/mobile-backend/auth/validate-session"
+            ]
+          },
+          {
+            "group": "OTP Management",
+            "pages": [
+              "v1/mobile-backend/otp/create-otp",
+              "v1/mobile-backend/otp/validate-otp",
+              "v1/mobile-backend/otp/resend-otp"
+            ]
+          },
+          {
+            "group": "User Management",
+            "pages": [
+              "v1/mobile-backend/users/get-user-by-id",
+              "v1/mobile-backend/users/get-current-user"
+            ]
+          }
+        ]
+      },
+      {
+        "version": "Integration Guides",
+        "groups": [
+          {
+            "group": "API Integration",
+            "pages": [
+              "v1/integration/overview",
+              "v1/integration/authentication-flows",
+              "v1/integration/error-handling",
+              "v1/integration/rate-limiting"
+            ]
+          },
+          {
+            "group": "Development",
+            "pages": [
+              "v1/development/setup",
+              "v1/development/database-setup",
+              "v1/development/environment-config",
+              "v1/development/testing"
             ]
           }
         ]
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Updates",
-          "href": "https://mintlify.com/blog",
-          "icon": "flame"
-        },
-        {
-          "anchor": "Quick Start",
-          "href": "http://localhost:3003/v1/central-backend/quickstart",
-          "icon": "pizza"
-        },
-        {
-          "anchor": "Create JWT Secret",
-          "href": "http://localhost:3003/v1/central-backend/jwt-secret-setup",
-          "icon": "code"
-        },
-        {
-          "anchor": "Database Setup",
-          "href": "http://localhost:3003/v1/central-backend/database-setup",
-          "icon": "database"
-        },
-        {
-          "anchor": "BackBlaze Setup",
-          "href": "http://localhost:3003/v1/central-backend/backblaze-setup",
-          "icon": "image"
-        },
-        {
-          "anchor": "Finish Environment Setup",
-          "href": "http://localhost:3003/v1/central-backend/finish-setup",
-          "icon": "container"
-        }
-      ]
-    }
+    ]
   },
   "logo": {
     "light": "/logo/Urban Management light.svg",

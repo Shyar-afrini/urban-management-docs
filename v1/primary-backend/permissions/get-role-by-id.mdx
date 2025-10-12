@@ -1,0 +1,46 @@
+---
+title: "Get Role by ID"
+description: "Get role by UUID with permissions"
+---
+
+<Info>Authenticated route</Info>
+## GET /permissions/roles/uuid
+
+<ResponseField
+  name="uuid"
+  type="param"
+  example="7e11fb1c-4a36-4b35-a168-89cf9f6ab8c1"
+  required
+/>
+
+### Helpers
+
+Type and schema helpers for parsing and inferring types
+
+```ts RoleWithPermissions
+//? Use this for type infer
+const role: RoleWithPermissions;
+```
+
+<ResponseExample>
+```json Success
+{
+    "success": true,
+    "data": {
+        "id": "7e11fb1c-4a36-4b35-a168-89cf9f6ab8c1",
+        "name": "Admin",
+        "description": "Full administrative access",
+        "permissions": [
+            "user:read",
+            "user:write",
+            "user:delete",
+            "admin:read",
+            "admin:write",
+            "admin:delete"
+        ],
+        "createdAt": "2025-09-11T13:38:20.424Z",
+        "updatedAt": "2025-09-11T13:38:20.424Z"
+    }
+}
+```
+</ResponseExample>

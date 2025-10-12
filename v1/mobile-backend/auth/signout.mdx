@@ -1,0 +1,79 @@
+---
+title: "Sign Out"
+description: "Terminate mobile user session"
+---
+
+## Overview
+
+The sign-out endpoint terminates the current mobile user session and invalidates the session token.
+
+## Endpoint
+
+```
+POST /api/v1/auth/signout
+```
+
+## Request
+
+### Headers
+```http
+Authorization: Bearer {session_token}
+```
+
+### Authentication
+Requires valid session token from OTP validation.
+
+## Response
+
+### Success Response (204 No Content)
+
+The endpoint returns a `204 No Content` status with no response body.
+
+## Error Responses
+
+### Unauthorized (401 Unauthorized)
+
+```json
+{
+  "success": false,
+  "error": {
+    "message": "Not logged in",
+    "code": "UNAUTHORIZED",
+    "details": "No valid session found"
+  }
+}
+```
+
+## Example Usage
+
+### JavaScript/Fetch
+
+```javascript
+const signOut = async (sessionToken) => {
+  try {
+    const response = await fetch('/api/v1/auth/signout', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${sessionToken}`,
+      }
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error.message);
+    }
+
+    // Session terminated successfully
+    console.log('Signed out successfully');
+  } catch (error) {
+    console.error('Sign out failed:', error.message);
+    throw error;
+  }
+};
+```
+
+## Related Endpoints
+
+- [Phone Sign In](/v1/mobile-backend/auth/signin)
+- [Create OTP](/v1/mobile-backend/otp/create-otp)
+- [Validate OTP](/v1/mobile-backend/otp/validate-otp)

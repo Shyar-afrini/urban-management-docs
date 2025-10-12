@@ -1,0 +1,318 @@
+---
+title: "Validate OTP"
+description: "Validate OTP code and get session token"
+---
+
+## Overview
+
+The validate OTP endpoint verifies the OTP code sent to the user's phone and returns a session token for authenticated API calls.
+
+## Endpoint
+
+```
+POST /api/v1/auth/otp/validate
+```
+
+## Request
+
+### Headers
+```http
+Content-Type: application/json
+Authorization: Bearer {access_token}
+```
+
+### Body
+```json
+{
+  "otp": "123456"
+}
+```
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `otp` | string | Yes | 6-digit OTP code |
+
+### Authentication
+Requires Bearer token from phone sign-in endpoint.
+
+## Response
+
+### Success Response (200 OK)
+
+```json
+{
+  "message": "OTP validated successfully",
+  "sessionToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `message` | string | Success message |
+| `sessionToken` | string | JWT session token for API calls |
+
+## Error Responses
+
+### Invalid OTP (400 Bad Request)
+
+```json
+{
+  "success": false,
+  "error": {
+    "message": "Invalid OTP code",
+    "code": "INVALID_OTP",
+    "details": "OTP code is incorrect"
+  }
+}
+```
+
+### OTP Expired (400 Bad Request)
+
+```json
+{
+  "success": false,
+  "error": {
+    "message": "OTP has expired",
+    "code": "OTP_EXPIRED",
+    "details": "OTP is only valid for 5 minutes"
+  }
+}
+```
+
+## Example Usage
+
+### JavaScript/Fetch
+
+```javascript
+const validateOTP = async (otp, accessToken) => {
+  try {
+    const response = await fetch('/api/v1/auth/otp/validate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ otp })
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error.message);
+    }
+
+    const data = await response.json();
+    
+    // Store session token for API calls
+    localStorage.setItem('sessionToken', data.sessionToken);
+    
+    return data;
+  } catch (error) {
+    console.error('OTP validation failed:', error.message);
+    throw error;
+  }
+};
+
+// Usage
+try {
+  const accessToken = localStorage.getItem('accessToken');
+  const result = await validateOTP('123456', accessToken);
+  console.log('OTP validated:', result.message);
+  console.log('Session token:', result.sessionToken);
+} catch (error) {
+  console.error('OTP validation failed:', error.message);
+}
+```
+
+### React Native
+
+```javascript
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const validateOTP = async (otp) => {
+  try {
+    const accessToken = await AsyncStorage.getItem('accessToken');
+    
+    const response = await fetch('http://localhost:3002/api/v1/auth/otp/validate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ otp })
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.error.message);
+    }
+    
+    // Store session token securely
+    await AsyncStorage.setItem('sessionToken', data.sessionToken);
+    
+    return data;
+  } catch (error) {
+    console.error('OTP validation failed:', error.message);
+    throw error;
+  }
+};
+```
+
+### Flutter
+
+```dart
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+
+class OTPService {
+  static const String baseURL = 'http://localhost:3002/api/v1';
+  
+  Future<Map<String, dynamic>> validateOTP(String otp) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final accessToken = prefs.getString('accessToken');
+      
+      if (accessToken == null) {
+        throw Exception('No access token found');
+      }
+      
+      final response = await http.post(
+        Uri.parse('$baseURL/auth/otp/validate'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
+        },
+        body: json.encode({'otp': otp}),
+      );
+      
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        
+        // Store session token
+        await prefs.setString('sessionToken', data['sessionToken']);
+        
+        return data;
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(error['error']['message']);
+      }
+    } catch (e) {
+      throw Exception('OTP validation failed: $e');
+    }
+  }
+}
+```
+
+## OTP Validation Rules
+
+### Format Requirements
+- **Length**: Exactly 6 digits
+- **Type**: Numeric only
+- **Example**: `123456`
+
+### Expiration Rules
+- **Lifetime**: 5 minutes from creation
+- **Single Use**: Each OTP can only be used once
+- **Auto Expiry**: OTPs expire automatically
+
+### Security Features
+- **Rate Limiting**: Prevents brute force attacks
+- **Attempt Tracking**: Monitors failed validation attempts
+- **Secure Generation**: Cryptographically secure random numbers
+
+## UI Implementation
+
+### OTP Input Component
+
+```javascript
+const OTPInput = ({ onValidate }) => {
+  const [otp, setOtp] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (otp.length !== 6) {
+      setError('Please enter a 6-digit OTP');
+      return;
+    }
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      await onValidate(otp);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        value={otp}
+        onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+        placeholder="Enter 6-digit OTP"
+        maxLength={6}
+        className="otp-input"
+      />
+      
+      {error && <div className="error">{error}</div>}
+      
+      <button type="submit" disabled={loading || otp.length !== 6}>
+        {loading ? 'Validating...' : 'Validate OTP'}
+      </button>
+    </form>
+  );
+};
+```
+
+## Error Handling
+
+### Common Error Scenarios
+
+1. **Invalid OTP**: Wrong code entered
+2. **OTP Expired**: Code has expired (5-minute limit)
+3. **Rate Limited**: Too many validation attempts
+4. **Token Expired**: Access token has expired
+
+### Error Recovery
+
+```javascript
+const validateOTPWithRetry = async (otp, accessToken, maxRetries = 3) => {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await validateOTP(otp, accessToken);
+    } catch (error) {
+      if (error.message.includes('OTP_EXPIRED')) {
+        // Request new OTP
+        throw new Error('OTP expired. Please request a new OTP.');
+      }
+      
+      if (error.message.includes('INVALID_OTP') && i < maxRetries - 1) {
+        // Wait before retry
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        continue;
+      }
+      
+      throw error;
+    }
+  }
+};
+```
+
+## Related Endpoints
+
+- [Phone Sign In](/v1/mobile-backend/auth/signin)
+- [Create OTP](/v1/mobile-backend/otp/create-otp)
+- [Resend OTP](/v1/mobile-backend/otp/resend-otp)
+- [Sign Out](/v1/mobile-backend/auth/signout)

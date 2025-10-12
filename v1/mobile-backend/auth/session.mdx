@@ -1,0 +1,67 @@
+---
+title: "Session Management"
+description: "Create and manage mobile user sessions"
+---
+
+## Overview
+
+The session endpoint creates a new session for authenticated mobile users after OTP validation.
+
+## Endpoint
+
+```
+POST /api/v1/auth/session
+```
+
+## Request
+
+### Headers
+```http
+Authorization: Bearer {access_token}
+```
+
+### Authentication
+Requires valid access token from phone sign-in.
+
+## Response
+
+### Success Response (200 OK)
+
+```json
+{
+  "sessionToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "userId": "550e8400-e29b-41d4-a716-446655440000",
+  "expiresAt": "2024-01-01T00:00:00Z"
+}
+```
+
+## Example Usage
+
+```javascript
+const createSession = async (accessToken) => {
+  try {
+    const response = await fetch('/api/v1/auth/session', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      }
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error.message);
+    }
+
+    const session = await response.json();
+    return session;
+  } catch (error) {
+    console.error('Session creation failed:', error.message);
+    throw error;
+  }
+};
+```
+
+## Related Endpoints
+
+- [Phone Sign In](/v1/mobile-backend/auth/signin)
+- [Validate OTP](/v1/mobile-backend/otp/validate-otp)

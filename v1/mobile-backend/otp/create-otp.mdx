@@ -1,0 +1,351 @@
+---
+title: "Create OTP"
+description: "Generate and send OTP for mobile user verification"
+---
+
+## Overview
+
+The create OTP endpoint generates a one-time password and sends it via SMS to the user's phone number. This is the second step in the mobile authentication flow after phone sign-in.
+
+## Endpoint
+
+```
+POST /api/v1/auth/otp/create
+```
+
+## Request
+
+### Headers
+```http
+Authorization: Bearer {access_token}
+```
+
+### Authentication
+Requires Bearer token from phone sign-in endpoint.
+
+## Response
+
+### Success Response (201 Created)
+
+```json
+{
+  "message": "OTP sent successfully to +1234567890"
+}
+```
+
+### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `message` | string | Confirmation message with phone number |
+
+## Error Responses
+
+### Unauthorized (401 Unauthorized)
+
+```json
+{
+  "success": false,
+  "error": {
+    "message": "Invalid or expired access token",
+    "code": "UNAUTHORIZED",
+    "details": "Please sign in again"
+  }
+}
+```
+
+### Rate Limit Exceeded (429 Too Many Requests)
+
+```json
+{
+  "success": false,
+  "error": {
+    "message": "Too many OTP requests",
+    "code": "RATE_LIMIT_EXCEEDED",
+    "details": "Please wait 60 seconds before requesting another OTP"
+  }
+}
+```
+
+### SMS Service Error (500 Internal Server Error)
+
+```json
+{
+  "success": false,
+  "error": {
+    "message": "Failed to send OTP",
+    "code": "SMS_SERVICE_ERROR",
+    "details": "SMS service is temporarily unavailable"
+  }
+}
+```
+
+## OTP Details
+
+### OTP Format
+- **Length**: 6 digits
+- **Type**: Numeric only
+- **Example**: `123456`
+
+### OTP Expiration
+- **Lifetime**: 5 minutes
+- **Single Use**: Each OTP can only be used once
+- **Auto Expiry**: OTPs expire automatically after 5 minutes
+
+### SMS Content
+The SMS sent to the user contains:
+```
+Your Urban Management verification code is: 123456
+This code expires in 5 minutes.
+```
+
+## Example Usage
+
+### JavaScript/Fetch
+
+```javascript
+const createOTP = async (accessToken) => {
+  try {
+    const response = await fetch('/api/v1/auth/otp/create', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      }
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error.message);
+    }
+
+    const data = await response.json();
+    return data.message;
+  } catch (error) {
+    console.error('OTP creation failed:', error.message);
+    throw error;
+  }
+};
+
+// Usage
+try {
+  const accessToken = localStorage.getItem('accessToken');
+  const message = await createOTP(accessToken);
+  console.log('OTP sent:', message);
+} catch (error) {
+  console.error('Failed to create OTP:', error.message);
+}
+```
+
+### React Native
+
+```javascript
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const createOTP = async () => {
+  try {
+    const accessToken = await AsyncStorage.getItem('accessToken');
+    
+    const response = await fetch('http://localhost:3002/api/v1/auth/otp/create', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      }
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.error.message);
+    }
+    
+    return data.message;
+  } catch (error) {
+    console.error('OTP creation failed:', error.message);
+    throw error;
+  }
+};
+```
+
+### Flutter
+
+```dart
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+class OTPService {
+  static const String baseURL = 'http://localhost:3002/api/v1';
+  
+  Future<String> createOTP() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final accessToken = prefs.getString('accessToken');
+      
+      if (accessToken == null) {
+        throw Exception('No access token found');
+      }
+      
+      final response = await http.post(
+        Uri.parse('$baseURL/auth/otp/create'),
+        headers: {'Authorization': 'Bearer $accessToken'},
+      );
+      
+      if (response.statusCode == 201) {
+        final data = json.decode(response.body);
+        return data['message'];
+      } else {
+        final error = json.decode(response.body);
+        throw Exception(error['error']['message']);
+      }
+    } catch (e) {
+      throw Exception('OTP creation failed: $e');
+    }
+  }
+}
+```
+
+## Rate Limiting
+
+### OTP Rate Limits
+- **Per Phone Number**: 1 OTP per minute
+- **Per IP Address**: 5 OTPs per minute
+- **Per User**: 3 OTPs per hour
+
+### Rate Limit Headers
+```http
+X-RateLimit-Limit: 1
+X-RateLimit-Remaining: 0
+X-RateLimit-Reset: 1640995260
+```
+
+## Security Features
+
+### OTP Security
+- **Random Generation**: Cryptographically secure random numbers
+- **Time-based Expiry**: 5-minute expiration window
+- **Single Use**: Each OTP can only be validated once
+- **Rate Limiting**: Prevents OTP spam and abuse
+
+### SMS Security
+- **Secure Delivery**: SMS sent through secure channels
+- **No Storage**: OTPs are not stored in plain text
+- **Audit Trail**: OTP generation is logged for security
+
+## Error Handling
+
+### Common Error Scenarios
+
+1. **Invalid Token**: Access token is expired or invalid
+2. **Rate Limited**: Too many OTP requests
+3. **SMS Failure**: SMS service is down or phone number invalid
+4. **Account Issues**: User account is inactive or blocked
+
+### Error Recovery
+
+```javascript
+const createOTPWithRetry = async (accessToken, maxRetries = 3) => {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await createOTP(accessToken);
+    } catch (error) {
+      if (error.message.includes('RATE_LIMIT_EXCEEDED')) {
+        // Wait before retry
+        await new Promise(resolve => setTimeout(resolve, 60000));
+        continue;
+      }
+      
+      if (i === maxRetries - 1) {
+        throw error;
+      }
+    }
+  }
+};
+```
+
+## User Experience
+
+### Best Practices
+
+1. **Clear Instructions**: Tell users to check their SMS
+2. **Timer Display**: Show countdown timer for OTP expiry
+3. **Resend Option**: Provide resend OTP functionality
+4. **Error Messages**: Show user-friendly error messages
+
+### UI Example
+
+```javascript
+const OTPForm = () => {
+  const [otpSent, setOtpSent] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(0);
+  
+  const handleSendOTP = async () => {
+    try {
+      const accessToken = localStorage.getItem('accessToken');
+      await createOTP(accessToken);
+      setOtpSent(true);
+      setTimeLeft(300); // 5 minutes
+      
+      // Start countdown timer
+      const timer = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      
+    } catch (error) {
+      alert(`Failed to send OTP: ${error.message}`);
+    }
+  };
+  
+  return (
+    <div>
+      {!otpSent ? (
+        <button onClick={handleSendOTP}>
+          Send OTP
+        </button>
+      ) : (
+        <div>
+          <p>OTP sent! Check your SMS.</p>
+          <p>Time remaining: {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</p>
+          {timeLeft === 0 && (
+            <button onClick={handleSendOTP}>
+              Resend OTP
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+```
+
+## Testing
+
+### Test OTPs
+In development environment, you can use test OTPs:
+- **Test OTP**: `123456` (always valid)
+- **Expired OTP**: `999999` (always expired)
+- **Invalid OTP**: Any other 6-digit number
+
+### Mock SMS Service
+For testing, you can configure the system to log OTPs instead of sending SMS:
+
+```javascript
+// Development configuration
+const config = {
+  smsService: {
+    enabled: false, // Disable SMS in development
+    logOTP: true,   // Log OTPs to console
+  }
+};
+```
+
+## Related Endpoints
+
+- [Phone Sign In](/v1/mobile-backend/auth/signin)
+- [Validate OTP](/v1/mobile-backend/otp/validate-otp)
+- [Resend OTP](/v1/mobile-backend/otp/resend-otp)
+- [Sign Out](/v1/mobile-backend/auth/signout)

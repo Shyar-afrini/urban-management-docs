@@ -1,0 +1,74 @@
+---
+title: "Get User by Phone"
+description: "Retrieve a user by their phone number"
+---
+
+## Overview
+
+The get user by phone endpoint retrieves user information using their phone number as the identifier.
+
+## Endpoint
+
+```
+GET /api/v1/users/phone?phoneNumber={phoneNumber}
+```
+
+## Request
+
+### Headers
+```http
+Cookie: session=jwt_token_here
+```
+
+### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `phoneNumber` | string | Yes | Phone number in international format |
+
+### Authentication
+Requires valid session cookie and `user:read` permission.
+
+## Response
+
+### Success Response (200 OK)
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "fullname": "John Doe",
+  "email": "john@example.com",
+  "phoneNumber": "+1234567890",
+  "isActive": true,
+  "role": "resident",
+  "createdAt": "2024-01-01T00:00:00Z",
+  "updatedAt": "2024-01-01T00:00:00Z"
+}
+```
+
+## Example Usage
+
+```javascript
+const getUserByPhone = async (phoneNumber) => {
+  try {
+    const response = await fetch(`/api/v1/users/phone?phoneNumber=${encodeURIComponent(phoneNumber)}`, {
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error.message);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Failed to get user by phone:', error.message);
+    throw error;
+  }
+};
+```
+
+## Related Endpoints
+
+- [Get Users](/v1/primary-backend/users/get-users)
+- [Get User by ID](/v1/primary-backend/users/get-user-by-id)

@@ -1,0 +1,261 @@
+---
+title: "Authentication Flow"
+description: "Understanding the authentication system in the Primary Backend"
+---
+
+## Overview
+
+The Primary Backend uses a cookie-based JWT authentication system with session management. This provides secure, stateless authentication while maintaining session state for enhanced security.
+
+## Authentication Architecture
+
+### Components
+
+1. **JWT Tokens**: Stateless authentication tokens
+2. **Session Storage**: Database-backed session management
+3. **Cookie Handling**: Automatic cookie management
+4. **Permission System**: Role-based access control
+
+### Flow Diagram
+
+<Mermaid>
+sequenceDiagram
+    participant Client
+    participant AuthController
+    participant AuthService
+    participant Database
+    participant AuthGuard
+
+    Client->>AuthController: POST /auth/signin
+    AuthController->>AuthService: validateCredentials()
+    AuthService->>Database: checkAdminCredentials()
+    Database-->>AuthService: admin data
+    AuthService->>AuthService: generateJWT()
+    AuthService->>AuthController: session token + admin data
+    AuthController->>Client: Set cookie + return admin data
+    
+    Note over Client: Subsequent requests include cookie
+    
+    Client->>AuthGuard: Request with cookie
+    AuthGuard->>Database: validateSession()
+    Database-->>AuthGuard: session data
+    AuthGuard->>AuthGuard: checkPermissions()
+    AuthGuard-->>Client: Allow/Deny access
+</Mermaid>
+
+## Authentication Endpoints
+
+### Sign In
+
+**Endpoint**: `POST /auth/signin`
+
+**Request Body**:
+```json
+{
+  "email": "admin@example.com",
+  "password": "password123"
+}
+```
+
+**Response**:
+```json
+{
+  "id": "uuid",
+  "fullname": "Admin Name",
+  "email": "admin@example.com",
+  "isActive": true,
+  "profilePhoto": "url"
+}
+```
+
+**Cookie**: Automatically sets `session` cookie with JWT token
+
+### Sign Out
+
+**Endpoint**: `POST /auth/signout`
+
+**Response**: `204 No Content`
+
+**Action**: Invalidates session and clears cookies
+
+### Session Management
+
+**Endpoint**: `POST /auth/session`
+
+**Headers**: Requires `session` cookie
+
+**Response**:
+```json
+{
+  "sessionToken": "jwt_token",
+  "adminId": "uuid",
+  "expiresAt": "2024-01-01T00:00:00Z"
+}
+```
+
+### Session Validation
+
+**Endpoint**: `POST /auth/session/validate`
+
+**Headers**: Requires `session` cookie
+
+**Response**:
+```json
+{
+  "expiresAt": 1704067200000,
+  "message": "Session Expires At: 1/1/2024, 12:00:00 AM"
+}
+```
+
+## Security Features
+
+### JWT Token Structure
+
+```json
+{
+  "sub": "admin_id",
+  "iat": 1704067200,
+  "exp": 1704153600,
+  "iss": "urban-management",
+  "aud": "admin"
+}
+```
+
+### Session Security
+
+- **HttpOnly Cookies**: Prevents XSS attacks
+- **Secure Flag**: HTTPS only in production
+- **SameSite**: CSRF protection
+- **Expiration**: Automatic token expiration
+- **Database Validation**: Server-side session validation
+
+### Permission System
+
+The system uses granular permissions:
+
+- `admin:read` - Read admin data
+- `admin:write` - Create/update admins
+- `admin:delete` - Delete admins
+- `user:read` - Read user data
+- `user:write` - Create/update users
+- `user:delete` - Delete users
+- `sector:read` - Read sector data
+- `sector:write` - Create/update sectors
+- `sector:delete` - Delete sectors
+- `building:read` - Read building data
+- `building:write` - Create/update buildings
+- `building:delete` - Delete buildings
+- And many more...
+
+## Error Handling
+
+### Authentication Errors
+
+```json
+{
+  "success": false,
+  "error": {
+    "message": "Invalid credentials",
+    "code": "INVALID_CREDENTIALS",
+    "details": "Email or password is incorrect"
+  }
+}
+```
+
+### Session Errors
+
+```json
+{
+  "success": false,
+  "error": {
+    "message": "Invalid or expired session",
+    "code": "INVALID_SESSION",
+    "details": "You might have signed in from another device"
+  }
+}
+```
+
+### Permission Errors
+
+```json
+{
+  "success": false,
+  "error": {
+    "message": "Insufficient permissions",
+    "code": "FORBIDDEN",
+    "details": "Required permission: user:read"
+  }
+}
+```
+
+## Best Practices
+
+### Client Implementation
+
+1. **Cookie Handling**: Let the browser handle cookies automatically
+2. **Error Handling**: Check for authentication errors and redirect to login
+3. **Session Refresh**: Implement automatic session refresh
+4. **Logout**: Always call signout endpoint when user logs out
+
+### Security Considerations
+
+1. **HTTPS**: Always use HTTPS in production
+2. **Token Expiration**: Handle token expiration gracefully
+3. **Permission Checks**: Always verify permissions on the client
+4. **Session Management**: Implement proper session cleanup
+
+## Integration Examples
+
+### JavaScript/Fetch
+
+```javascript
+// Sign in
+const response = await fetch('/api/v1/auth/signin', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  credentials: 'include', // Important for cookies
+  body: JSON.stringify({
+    email: 'admin@example.com',
+    password: 'password123'
+  })
+});
+
+// Subsequent requests automatically include cookies
+const data = await fetch('/api/v1/users', {
+  credentials: 'include'
+});
+```
+
+### Axios
+
+```javascript
+// Configure axios to include cookies
+axios.defaults.withCredentials = true;
+
+// Sign in
+const response = await axios.post('/api/v1/auth/signin', {
+  email: 'admin@example.com',
+  password: 'password123'
+});
+
+// Subsequent requests automatically include cookies
+const users = await axios.get('/api/v1/users');
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Cookie not set**: Ensure `credentials: 'include'` is set
+2. **Session expired**: Implement automatic re-authentication
+3. **Permission denied**: Check user permissions
+4. **CORS issues**: Verify CORS configuration
+
+### Debug Tips
+
+1. Check browser developer tools for cookies
+2. Verify JWT token expiration
+3. Check database session records
+4. Review server logs for authentication errors

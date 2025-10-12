@@ -1,0 +1,67 @@
+---
+title: "Update Unit"
+description: "Update unit information"
+---
+
+<Info>Authenticated route</Info>
+## PUT /sectors/units/uuid
+
+<ResponseField
+  name="uuid"
+  type="param"
+  example="7e11fb1c-4a36-4b35-a168-89cf9f6ab8c1"
+  required
+/>
+
+<Expandable title="Update Schema">
+  <ResponseField
+    name="unitNumber"
+    type="string"
+    example="A-101"
+  />
+  <ResponseField
+    name="floorId"
+    type="string"
+    example="7e11fb1c-4a36-4b35-a168-89cf9f6ab8c2"
+  >
+    Floor ID
+  </ResponseField>
+  <ResponseField
+    name="blockId"
+    type="string"
+    example="7e11fb1c-4a36-4b35-a168-89cf9f6ab8c3"
+  >
+    Block ID
+  </ResponseField>
+  <ResponseField
+    name="isOccupied"
+    type="boolean"
+    example="false"
+  />
+</Expandable>
+
+### Helpers
+
+Type and schema helpers for parsing and inferring types
+
+```ts Unit
+//? Use this for type infer
+const updateUnit: UpdateUnit;
+```
+
+<ResponseExample>
+```json Success
+{
+    "success": true,
+    "data": {
+        "id": "7e11fb1c-4a36-4b35-a168-89cf9f6ab8c1",
+        "unitNumber": "A-101",
+        "floorId": "7e11fb1c-4a36-4b35-a168-89cf9f6ab8c2",
+        "blockId": "7e11fb1c-4a36-4b35-a168-89cf9f6ab8c3",
+        "isOccupied": false,
+        "createdAt": "2025-09-11T13:38:20.424Z",
+        "updatedAt": "2025-09-11T13:38:20.424Z"
+    }
+}
+```
+</ResponseExample>

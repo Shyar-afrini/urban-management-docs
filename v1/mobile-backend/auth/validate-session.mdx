@@ -1,0 +1,66 @@
+---
+title: "Validate Session"
+description: "Validate mobile user session and check expiration"
+---
+
+## Overview
+
+The validate session endpoint checks if the current mobile user session is valid and returns session expiration information.
+
+## Endpoint
+
+```
+POST /api/v1/auth/session/validate
+```
+
+## Request
+
+### Headers
+```http
+Authorization: Bearer {session_token}
+```
+
+### Authentication
+Requires valid session token.
+
+## Response
+
+### Success Response (200 OK)
+
+```json
+{
+  "expiresAt": 1704067200000,
+  "message": "Session Expires At: 1/1/2024, 12:00:00 AM"
+}
+```
+
+## Example Usage
+
+```javascript
+const validateSession = async (sessionToken) => {
+  try {
+    const response = await fetch('/api/v1/auth/session/validate', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${sessionToken}`,
+      }
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error.message);
+    }
+
+    const sessionInfo = await response.json();
+    return sessionInfo;
+  } catch (error) {
+    console.error('Session validation failed:', error.message);
+    throw error;
+  }
+};
+```
+
+## Related Endpoints
+
+- [Phone Sign In](/v1/mobile-backend/auth/signin)
+- [Sign Out](/v1/mobile-backend/auth/signout)

@@ -1,0 +1,73 @@
+---
+title: "Get User by ID"
+description: "Retrieve a specific mobile user by their unique identifier"
+---
+
+## Overview
+
+The get user by ID endpoint retrieves detailed information about a specific mobile user using their unique identifier.
+
+## Endpoint
+
+```
+GET /api/v1/users/{id}
+```
+
+## Request
+
+### Headers
+```http
+Authorization: Bearer {session_token}
+```
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | User UUID (version 4) |
+
+### Authentication
+Requires valid session token.
+
+## Response
+
+### Success Response (200 OK)
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "phoneNumber": "+1234567890",
+  "isActive": true,
+  "createdAt": "2024-01-01T00:00:00Z",
+  "updatedAt": "2024-01-01T00:00:00Z"
+}
+```
+
+## Example Usage
+
+```javascript
+const getUserById = async (userId, sessionToken) => {
+  try {
+    const response = await fetch(`/api/v1/users/${userId}`, {
+      headers: {
+        'Authorization': `Bearer ${sessionToken}`,
+      }
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error.message);
+    }
+
+    const user = await response.json();
+    return user;
+  } catch (error) {
+    console.error('Failed to get user:', error.message);
+    throw error;
+  }
+};
+```
+
+## Related Endpoints
+
+- [Get Current User](/v1/mobile-backend/users/get-current-user)

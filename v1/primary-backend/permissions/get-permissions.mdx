@@ -1,0 +1,59 @@
+---
+title: "Get Permissions"
+description: "Get all permissions"
+---
+
+<Info>Authenticated route</Info>
+## GET /permissions
+
+### Helpers
+
+Type and schema helpers for parsing and inferring types
+
+```ts string[]
+//? Use this for type infer
+const permissions: string[];
+```
+
+<ResponseExample>
+```json Success
+{
+    "success": true,
+    "data": [
+        "user:read",
+        "user:write",
+        "user:delete",
+        "admin:read",
+        "admin:write",
+        "admin:delete",
+        "vehicle:read",
+        "vehicle:write",
+        "vehicle:delete",
+        "sector:read",
+        "sector:write",
+        "sector:delete",
+        "building:read",
+        "building:write",
+        "building:delete",
+        "floor:read",
+        "floor:write",
+        "floor:delete",
+        "unit:read",
+        "unit:write",
+        "unit:delete",
+        "block:read",
+        "block:write",
+        "block:delete",
+        "family:read",
+        "family:write",
+        "family:delete",
+        "address:read",
+        "address:write",
+        "address:delete",
+        "image:read",
+        "image:write",
+        "image:delete"
+    ]
+}
+```
+</ResponseExample>

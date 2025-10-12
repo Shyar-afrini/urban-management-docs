@@ -1,0 +1,53 @@
+---
+title: "Remove Permissions from Role"
+description: "Remove permissions from an existing role"
+---
+
+<Info>Authenticated route</Info>
+## DELETE /permissions/roles/uuid/permissions
+
+<ResponseField
+  name="uuid"
+  type="param"
+  example="7e11fb1c-4a36-4b35-a168-89cf9f6ab8c1"
+  required
+/>
+
+<Expandable title="Permissions Schema">
+  <ResponseField
+    name="permissions"
+    type="string[]"
+    example="['user:write']"
+    required
+  >
+    Array of permission strings to remove
+  </ResponseField>
+</Expandable>
+
+### Helpers
+
+Type and schema helpers for parsing and inferring types
+
+```ts RoleWithPermissions
+//? Use this for type infer
+const roleWithPermissions: RoleWithPermissions;
+```
+
+<ResponseExample>
+```json Success
+{
+    "success": true,
+    "data": {
+        "id": "7e11fb1c-4a36-4b35-a168-89cf9f6ab8c1",
+        "name": "Manager",
+        "description": "Manager role with limited permissions",
+        "permissions": [
+            "user:read",
+            "vehicle:read"
+        ],
+        "createdAt": "2025-09-11T13:38:20.424Z",
+        "updatedAt": "2025-09-11T13:38:20.424Z"
+    }
+}
+```
+</ResponseExample>

@@ -1,9 +1,146 @@
 ---
-title: "Quick Start"
-description: "Quick start for mobile app"
+title: "Mobile Backend Quickstart"
+description: "Get started with the Urban Management Mobile Backend API"
 ---
 
-<Info>
-  This is just a blank page please proceed to the Authorization section of the
-  docs
-</Info>
+## Overview
+
+The Urban Management Mobile Backend is a streamlined NestJS-based API designed specifically for mobile applications. It provides authentication, user management, and OTP verification functionality optimized for mobile use cases.
+
+## Base URL
+
+```
+http://localhost:3002/api/v1
+```
+
+## Key Features
+
+- **Phone-based Authentication**: Uses phone numbers for user identification
+- **OTP Verification**: SMS-based one-time password verification
+- **Bearer Token Authentication**: Header-based JWT authentication
+- **Mobile-optimized**: Lightweight and fast responses
+- **Session Management**: Secure session handling for mobile apps
+- **Rate Limiting**: Built-in protection against abuse
+
+## Architecture
+
+The Mobile Backend follows a simplified architecture with focused functionality:
+
+### Controllers
+- **AuthController**: Handles phone-based authentication and OTP
+- **UsersController**: Manages mobile user operations
+
+### Services
+- **AuthService**: Handles authentication logic and OTP management
+- **UsersService**: Manages user data operations
+
+### Guards & Middleware
+- **AuthGuard**: Validates Bearer tokens from Authorization header
+- **EnvelopeInterceptor**: Standardizes response format
+- **EnvelopeExceptionFilter**: Standardizes error responses
+
+## Authentication Flow
+
+The Mobile Backend uses a phone-based authentication system:
+
+1. **Phone Sign In**: POST `/auth/signin` with phone number
+2. **OTP Creation**: POST `/auth/otp/create` to generate OTP
+3. **OTP Validation**: POST `/auth/otp/validate` to verify OTP
+4. **Session Management**: Use Bearer token for subsequent requests
+5. **Sign Out**: POST `/auth/signout` to invalidate session
+
+## Authentication Methods
+
+### Bearer Token Authentication
+```http
+Authorization: Bearer jwt_token_here
+```
+
+### Phone Number Format
+Phone numbers must be in international format:
+```
++1234567890
+```
+
+## Response Format
+
+All responses follow a standardized format:
+
+```json
+{
+  "success": true,
+  "data": { ... },
+  "message": "Operation successful"
+}
+```
+
+Error responses:
+
+```json
+{
+  "success": false,
+  "error": {
+    "message": "Error description",
+    "code": "ERROR_CODE",
+    "details": { ... }
+  }
+}
+```
+
+## Rate Limiting
+
+The API implements rate limiting:
+- **Default**: 100 requests per minute
+- **OTP Endpoints**: Stricter limits to prevent abuse
+
+## Getting Started
+
+1. **Set up environment variables**
+2. **Configure database connection**
+3. **Start the server**: `npm run start:dev`
+4. **Authenticate**: Use phone number and OTP flow
+5. **Make API calls**: Include Bearer token in Authorization header
+
+## Mobile Integration
+
+### React Native Example
+```javascript
+// Configure API client
+const apiClient = axios.create({
+  baseURL: 'http://localhost:3002/api/v1',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Add token to requests
+apiClient.interceptors.request.use((config) => {
+  const token = AsyncStorage.getItem('authToken');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+```
+
+### Flutter Example
+```dart
+class ApiClient {
+  static const String baseUrl = 'http://localhost:3002/api/v1';
+  
+  static Future<Map<String, String>> _getHeaders() async {
+    final token = await SecureStorage.read('authToken');
+    return {
+      'Content-Type': 'application/json',
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+  }
+}
+```
+
+## Next Steps
+
+- [Authentication Flow](/v1/mobile-backend/authentication-flow)
+- [API Patterns](/v1/mobile-backend/api-patterns)
+- [Phone Sign In](/v1/mobile-backend/auth/signin)
+- [OTP Management](/v1/mobile-backend/otp/create-otp)
